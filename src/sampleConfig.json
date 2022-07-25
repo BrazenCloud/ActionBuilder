@@ -1,0 +1,23 @@
+{
+    "Name": "ipconfig",
+    "ActionType": "OsCommand",
+    "OperatingSystems": [
+        "Windows"
+    ],
+    "Command": "ipconfig",
+    "IncludeParametersParameter": true,
+    "DefaultParameters": "",
+    "RedirectCommandOutput": true,
+    "ActionParameters": [
+        {
+            "Name": "All",
+            "CommandParameters": "/all",
+            "Description": "Shows the entire IP configuration"
+        },
+        {
+            "Name": "Show DNS",
+            "CommandParameters": "/displaydns",
+            "Description": "Shows the entire DNS cache"
+        }
+    ]
+}
