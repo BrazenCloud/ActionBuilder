@@ -40,10 +40,13 @@ Function New-BcOsCommandAction {
             if ($RedirectCommandOutput.IsPresent) {
                 $Command = "$Command | Out-File .\results\out.txt"
             }
-            $windowsTemplate -replace '\{ if \}', $Command | Out-File "$OutPath\$Name\Windows\script.ps1"
+            $windowsTemplate -replace '\{ if \}', $Command | Out-File "$OutPath\$Name\windows\script.ps1"
         }
         if ($Linux.IsPresent) {
-
+            if ($RedirectCommandOutput.IsPresent) {
+                $Command = "$Command >> ./results/out.txt"
+            }
+            $linuxTemplate -replace '\{ if \}', $Command | Out-File "$OutPath\$Name\linux\script.ps1"
         }
     }
 }
