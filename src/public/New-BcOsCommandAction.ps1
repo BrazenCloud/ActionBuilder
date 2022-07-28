@@ -37,25 +37,32 @@ Function New-BcOsCommandAction {
     $action = [BcAction]::new()
     $action.Manifest = [BcManifest]::new()
 
+    # update manifest based on os
+    if (-not $Windows.IsPresent) {
+        $action.Manifest.WindowsCommand = $null
+    }
+    if (-not $Linux.IsPresent) {
+        $action.Manifest.LinuxCommand = $null
+    }
+
     # if no parameters and no includeParametersParameter
     # then this is simple
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
         if ($Windows.IsPresent) {
             if ($RedirectCommandOutput.IsPresent) {
-                $Command = "$Command | Out-File .\results\out.txt"
+                $wCommand = "$Command | Out-File .\results\out.txt"
             }
-            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', $Command
-        } else {
-            $action.Manifest.WindowsCommand = $null
+            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', $wCommand
         }
         if ($Linux.IsPresent) {
             if ($RedirectCommandOutput.IsPresent) {
-                $Command = "$Command >> ./results/out.txt"
+                $lCommand = "$Command >> ./results/out.txt"
             }
-            $action.LinuxScript = $linuxTemplate -replace '\{ if \}', $Command -replace '\{ jq \}', ''
-        } else {
-            $action.Manifest.LinuxCommand = $null
+            $action.LinuxScript = $linuxTemplate.Replace('{ if }', $lCommand).Replace('{ jq }', '')
         }
+        # if it has action parameters
+    } elseif ($ActionParameters.Count -gt 0) {
+
     }
     $action
 }
