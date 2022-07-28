@@ -19,6 +19,7 @@ Function New-BcOsCommandAction {
     $windowsIfBoolTemplate = Get-Template -Name osCommand-WindowsIfBool
     $linuxIfBoolTemplate = Get-Template -Name osCommand-LinuxIfBool
     $linuxJqTemplate = Get-Template -Name osCommand-LinuxJq
+    $windowsIfStringTemplate = Get-Template -Name osCommand-WindowsIfString
 
     $action = [BcAction]::new()
     $action.Manifest = [BcManifest]::new()
@@ -74,8 +75,13 @@ Function New-BcOsCommandAction {
             $mcSplat.OS = 'Windows'
             $ifs = foreach ($aParam in $Action.Parameters) {
                 # if this param has a default value, use it, else it must have come from the passed actionParameters var
-                $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
-                $windowsIfBoolTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
+                if ($aParam.Type -eq 2) {
+                    $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
+                    $windowsIfBoolTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
+                } elseif ($aParam.Type -eq 0) {
+                    $mcSplat.Parameters = "`$settings.'$($aParam.Name)'"
+                    $windowsIfStringTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
+                }
             }
 
             $action.WindowsScript = $windowsTemplate.Replace('{ if }', ($ifs -join "`n"))

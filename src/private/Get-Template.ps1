@@ -17,6 +17,9 @@ Function Get-Template {
                 'WindowsIfBool' {
                     Get-Content $PSScriptRoot\templates\osCommand\ifBool.ps1 -Raw
                 }
+                'WindowsIfString' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifString.ps1 -Raw
+                }
                 'LinuxIfBool' {
                     Get-Content $PSScriptRoot\templates\osCommand\ifBool.sh -Raw
                 }
