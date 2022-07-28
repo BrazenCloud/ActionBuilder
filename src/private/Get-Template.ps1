@@ -14,11 +14,11 @@ Function Get-Template {
                 'Linux' {
                     Get-Content $PSScriptRoot\templates\osCommand\linux.sh -Raw
                 }
-                'WindowsIf' {
-                    Get-Content $PSScriptRoot\templates\osCommand\if.ps1 -Raw
+                'WindowsIfBool' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifBool.ps1 -Raw
                 }
-                'LinuxIf' {
-                    Get-Content $PSScriptRoot\templates\osCommand\if.sh -Raw
+                'LinuxIfBool' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifBool.sh -Raw
                 }
                 'LinuxJq' {
                     Get-Content $PSScriptRoot\templates\osCommand\jq.sh -Raw

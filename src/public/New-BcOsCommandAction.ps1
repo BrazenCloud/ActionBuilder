@@ -16,8 +16,8 @@ Function New-BcOsCommandAction {
     $parameterTemplate = Get-Template -Name parameters | ConvertFrom-Json -AsHashtable
     $windowsTemplate = Get-Template -Name osCommand-Windows
     $linuxTemplate = Get-Template -Name osCommand-Linux
-    $windowsIfTemplate = Get-Template -Name osCommand-WindowsIf
-    $linuxIfTemplate = Get-Template -Name osCommand-LinuxIf
+    $windowsIfBoolTemplate = Get-Template -Name osCommand-WindowsIfBool
+    $linuxIfBoolTemplate = Get-Template -Name osCommand-LinuxIfBool
     $linuxJqTemplate = Get-Template -Name osCommand-LinuxJq
 
     $action = [BcAction]::new()
@@ -75,7 +75,7 @@ Function New-BcOsCommandAction {
             $ifs = foreach ($aParam in $Action.Parameters) {
                 # if this param has a default value, use it, else it must have come from the passed actionParameters var
                 $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
-                $windowsIfTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
+                $windowsIfBoolTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
             }
 
             $action.WindowsScript = $windowsTemplate.Replace('{ if }', ($ifs -join "`n"))
@@ -95,7 +95,7 @@ Function New-BcOsCommandAction {
             $ifs = foreach ($aParam in $Action.Parameters) {
                 # if this param has a default value, use it, else it must have come from the passed actionParameters var
                 $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
-                $linuxIfTemplate.Replace('{param}', ($aParam.Name -replace $linuxVarNameReplace, '')).Replace('{command}', (makeCommand @mcSplat))
+                $linuxIfBoolTemplate.Replace('{param}', ($aParam.Name -replace $linuxVarNameReplace, '')).Replace('{command}', (makeCommand @mcSplat))
             }
 
             $action.LinuxScript = $linuxTemplate.Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n"))
