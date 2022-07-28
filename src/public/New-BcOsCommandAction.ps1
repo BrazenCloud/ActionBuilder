@@ -3,6 +3,7 @@ Function New-BcOsCommandAction {
     [cmdletbinding()]
     param (
         [string]$Name,
+        [string]$Description,
         [string]$Command,
         [hashtable[]]$ActionParameters,
         [string]$DefaultParameters,
@@ -12,8 +13,6 @@ Function New-BcOsCommandAction {
         [switch]$Linux,
         [string]$OutPath
     )
-    $parameters = @()
-    $parameterTemplate = Get-Template -Name parameters | ConvertFrom-Json -AsHashtable
     $windowsTemplate = Get-Template -Name osCommand-Windows
     $linuxTemplate = Get-Template -Name osCommand-Linux
     $windowsIfBoolTemplate = Get-Template -Name osCommand-WindowsIfBool
@@ -23,7 +22,6 @@ Function New-BcOsCommandAction {
     $linuxIfStringTemplate = Get-Template -Name osCommand-LinuxIfString
 
     $action = [BcAction]::new()
-    $action.Manifest = [BcManifest]::new()
 
     # Build the parameters
     foreach ($param in $ActionParameters) {
@@ -43,11 +41,18 @@ Function New-BcOsCommandAction {
         $action.Parameters += $newParam
     }
 
-    # update manifest based on os
-    if (-not $Windows.IsPresent) {
+    # update repository and manifest
+    $action.Repository.Description = $Description
+    if ($Windows.IsPresent) {
+        $action.Repository.Language = 'OS Command'
+        $action.Repository.Tags += 'Windows'
+    } else {
         $action.Manifest.WindowsCommand = $null
     }
-    if (-not $Linux.IsPresent) {
+    if ($Linux.IsPresent) {
+        $action.Repository.Language = 'OS Command'
+        $action.Repository.Tags += 'Linux'
+    } else {
         $action.Manifest.LinuxCommand = $null
     }
 

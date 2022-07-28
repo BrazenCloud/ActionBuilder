@@ -11,6 +11,7 @@ Function Export-BcAction {
             'OSCommand' {
                 $splat = @{
                     Name                       = $null -ne $actionHt.Name ? $actionHt.Name : $null
+                    Description                = $null -ne $actionHt.Description ? $actionHt.Description : $null
                     Command                    = $null -ne $actionHt.Command ? $actionHt.Command : $null
                     ActionParameters           = $null -ne $actionHt.ActionParameters ? $actionHt.ActionParameters : $null
                     DefaultParameters          = $null -ne $actionHt.DefaultParameters ? $actionHt.DefaultParameters : $null

@@ -1,11 +1,15 @@
-Class BcAction {
+class BcAction {
     [BcManifest]$Manifest
     [BcParameter[]]$Parameters
+    [BcRepository]$Repository
     [hashtable]$Execution
     [string]$WindowsScript
     [string]$LinuxScript
 
-    BcAction() {}
+    BcAction() {
+        $this.Manifest = [BcManifest]::new()
+        $this.Repository = [BcRepository]::new()
+    }
 
     [bool] Test() {
         if ($null -eq $this.Manifest) {
@@ -37,8 +41,16 @@ Class BcAction {
 
             # output the parameters
             if ($this.Parameters.Count -gt 0) {
-                $this.Parameters | ConvertTo-Json | Out-File $outDir\parameters.json
+                $this.Parameters | ConvertTo-Json -AsArray | Out-File $outDir\parameters.json
             }
+
+            # output the execution files, if exists
+            if ($null -ne $this.Execution) {
+                $this.Execution | ConvertTo-Json | Out-File $outDir\execution.json
+            }
+
+            # output the repository.json file
+            $this.Repository | ConvertTo-Json | Out-File $outDir\repository.json
 
             # output the windows script, if exists
             if ($null -ne $this.WindowsScript) {
@@ -54,13 +66,6 @@ Class BcAction {
                     New-Item $outDir\linux -ItemType Directory
                 }
                 $this.LinuxScript | Out-File $outDir\linux\script.sh
-            }
-
-            # output the parameter and execution files, if exists
-            foreach ($file in @('Parameters', 'Execution')) {
-                if ($null -ne $this.$File) {
-                    $this.$File | ConvertTo-Json | Out-File $outDir\$file.json
-                }
             }
         } else {
             Throw 'Test failed. Be sure the action meets the minimum criteria of having both a manifest and at least a Windows or Linux script.'
