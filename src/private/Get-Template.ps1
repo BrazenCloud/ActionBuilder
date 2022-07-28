@@ -23,6 +23,9 @@ Function Get-Template {
                 'LinuxIfBool' {
                     Get-Content $PSScriptRoot\templates\osCommand\ifBool.sh -Raw
                 }
+                'LinuxIfString' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifString.sh -Raw
+                }
                 'LinuxJq' {
                     Get-Content $PSScriptRoot\templates\osCommand\jq.sh -Raw
                 }

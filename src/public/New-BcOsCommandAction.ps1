@@ -20,6 +20,7 @@ Function New-BcOsCommandAction {
     $linuxIfBoolTemplate = Get-Template -Name osCommand-LinuxIfBool
     $linuxJqTemplate = Get-Template -Name osCommand-LinuxJq
     $windowsIfStringTemplate = Get-Template -Name osCommand-WindowsIfString
+    $linuxIfStringTemplate = Get-Template -Name osCommand-LinuxIfString
 
     $action = [BcAction]::new()
     $action.Manifest = [BcManifest]::new()
@@ -94,14 +95,20 @@ Function New-BcOsCommandAction {
 
             $jqs = foreach ($aParam in $Action.Parameters) {
                 # {bashParam}=$(jq -r '."{param}"' ./settings.json)
-                $linuxJqTemplate.Replace('{bashParam}', ($aParam.Name -replace $linuxVarNameReplace, '')).Replace('{param}', $aParam.Name)
+                $bashParam = $aParam.Name -replace $linuxVarNameReplace, ''
+                $linuxJqTemplate.Replace('{bashParam}', $bashParam).Replace('{param}', $aParam.Name)
             }
 
 
             $ifs = foreach ($aParam in $Action.Parameters) {
-                # if this param has a default value, use it, else it must have come from the passed actionParameters var
-                $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
-                $linuxIfBoolTemplate.Replace('{param}', ($aParam.Name -replace $linuxVarNameReplace, '')).Replace('{command}', (makeCommand @mcSplat))
+                if ($aParam.Type -eq 2) {
+                    # if this param has a default value, use it, else it must have come from the passed actionParameters var
+                    $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
+                    $linuxIfBoolTemplate.Replace('{param}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
+                } elseIf ($aParam.Type -eq 0) {
+                    $mcSplat.Parameters = "`$$bashParam"
+                    $linuxIfStringTemplate.Replace('{bashParam}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
+                }
             }
 
             $action.LinuxScript = $linuxTemplate.Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n"))
