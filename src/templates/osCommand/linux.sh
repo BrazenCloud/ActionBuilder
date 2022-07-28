@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # check for current package manager
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
