@@ -1,6 +1,6 @@
 Class BcAction {
     [BcManifest]$Manifest
-    [hashtable]$Parameters
+    [BcParameter[]]$Parameters
     [hashtable]$Execution
     [string]$WindowsScript
     [string]$LinuxScript
@@ -34,6 +34,11 @@ Class BcAction {
 
             # output the manifest
             $this.Manifest.Export("$outDir\manifest.txt", $true)
+
+            # output the parameters
+            if ($this.Parameters.Count -gt 0) {
+                $this.Parameters | ConvertTo-Json | Out-File $outDir\parameters.json
+            }
 
             # output the windows script, if exists
             if ($null -ne $this.WindowsScript) {
