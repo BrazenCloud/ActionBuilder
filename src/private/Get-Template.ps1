@@ -8,11 +8,17 @@ Function Get-Template {
         }
         'osCommand' {
             switch ($Name.Split('-')[1]) {
-                'windows' {
+                'Windows' {
                     Get-Content $PSScriptRoot\templates\osCommand\windows.ps1 -Raw
                 }
                 'Linux' {
                     Get-Content $PSScriptRoot\templates\osCommand\linux.sh -Raw
+                }
+                'WindowsIf' {
+                    Get-Content $PSScriptRoot\templates\osCommand\if.ps1 -Raw
+                }
+                'LinuxIf' {
+                    Get-Content $PSScriptRoot\templates\osCommand\if.sh -Raw
                 }
             }
         }
