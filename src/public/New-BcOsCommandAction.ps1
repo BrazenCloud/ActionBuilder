@@ -35,6 +35,7 @@ Function New-BcOsCommandAction {
     }
 
     $action = [BcAction]::new()
+    $action.Manifest = [BcManifest]::new()
 
     # if no parameters and no includeParametersParameter
     # then this is simple
