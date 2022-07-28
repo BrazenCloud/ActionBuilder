@@ -9,10 +9,10 @@ Function Get-Template {
         'osCommand' {
             switch ($Name.Split('-')[1]) {
                 'windows' {
-                    Get-Content $PSScriptRoot\templates\osCommand\windows.ps1
+                    Get-Content $PSScriptRoot\templates\osCommand\windows.ps1 -Raw
                 }
                 'Linux' {
-                    Get-Content $PSScriptRoot\templates\osCommand\linux.sh
+                    Get-Content $PSScriptRoot\templates\osCommand\linux.sh -Raw
                 }
             }
         }
