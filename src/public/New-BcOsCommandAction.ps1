@@ -43,6 +43,7 @@ Function New-BcOsCommandAction {
 
     # update repository and manifest
     $action.Repository.Description = $Description
+    $action.Repository.Tags += $Command
     if ($Windows.IsPresent) {
         $action.Repository.Language = 'OS Command'
         $action.Repository.Tags += 'Windows'
