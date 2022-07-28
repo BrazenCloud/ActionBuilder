@@ -6,7 +6,9 @@ class BcParameter {
     [string]$Description
     [bool]$IsOptional
 
-    BcParameter() {}
+    BcParameter() {
+        $this.IsOptional = $true
+    }
 
     [string]ToString(
         [bool]$Compress
