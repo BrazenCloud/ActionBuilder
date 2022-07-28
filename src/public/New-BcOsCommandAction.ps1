@@ -45,12 +45,16 @@ Function New-BcOsCommandAction {
                 $Command = "$Command | Out-File .\results\out.txt"
             }
             $action.WindowsScript = $windowsTemplate -replace '\{ if \}', $Command
+        } else {
+            $action.Manifest.WindowsCommand = $null
         }
         if ($Linux.IsPresent) {
             if ($RedirectCommandOutput.IsPresent) {
                 $Command = "$Command >> ./results/out.txt"
             }
             $action.LinuxScript = $linuxTemplate -replace '\{ if \}', $Command -replace '\{ jq \}', ''
+        } else {
+            $action.Manifest.LinuxCommand = $null
         }
     }
     $action
