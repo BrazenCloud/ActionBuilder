@@ -16,6 +16,8 @@ Function New-BcOsCommandAction {
     $parameterTemplate = Get-Template -Name parameters | ConvertFrom-Json -AsHashtable
     $windowsTemplate = Get-Template -Name osCommand-Windows
     $linuxTemplate = Get-Template -Name osCommand-Linux
+    $windowsIfTemplate = Get-Template -Name osCommand-WindowsIf
+    $linuxIfTemplate = Get-Template -Name osCommand-LinuxIf
 
     $action = [BcAction]::new()
     $action.Manifest = [BcManifest]::new()
@@ -46,30 +48,38 @@ Function New-BcOsCommandAction {
         $action.Manifest.LinuxCommand = $null
     }
 
+    # declare splat
+    $mcSplat = @{
+        Command    = $Command
+        OS         = ''
+        Redirect   = $RedirectCommandOutput.IsPresent
+        Parameters = $DefaultParameters
+    }
+
     # if no parameters and no includeParametersParameter
     # then this is simple
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
-        $splat = @{
-            Command    = $Command
-            OS         = ''
-            Redirect   = $RedirectCommandOutput.IsPresent
-            Parameters = $DefaultParameters
-        }
         if ($Windows.IsPresent) {
             $splat['OS'] = 'Windows'
-            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', (makeCommand @splat)
+            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', (makeCommand @mcSplat)
         }
         if ($Linux.IsPresent) {
             $splat['OS'] = 'Linux'
-            $action.LinuxScript = $linuxTemplate.Replace('{ if }', (makeCommand @splat)).Replace('{ jq }', '')
+            $action.LinuxScript = $linuxTemplate.Replace('{ if }', (makeCommand @mcSplat)).Replace('{ jq }', '')
         }
         # if it has action parameters
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
         if ($Windows.IsPresent) {
+            $mcSplat.OS = 'Windows'
             
+            foreach ($aParam in $Action.Parameters) {
+                # if this param has a default value, use it, else it must have come from the passed actionParameters var
+                $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$ACtion.Parameters.IndexOf($aParam)]['CommandParameters']
+                $newIf = $windowsIfTemplate.Replace('{param}', $aParam.Name).Replace('{command}', (makeCommand @mcSplat))
+            }
         }
         if ($Linux.IsPresent) {
-
+            $mcSplat.OS = 'Linux'
         }
     }
     $action
