@@ -23,9 +23,9 @@ if ! [ -x "$(command -v jq)" ]; then
 
     # check for sudo, install
     if [ -x "$(command -v sudo)" ]; then
-        sudo $pman install jq
+        sudo $pman install jq -y
     else
-        $pman install jq
+        $pman install jq -y
     fi
 else
     echo "jq already installed"
