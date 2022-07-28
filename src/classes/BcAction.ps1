@@ -1,5 +1,5 @@
 Class BcAction {
-    [string]$Manifest
+    [BcManifest]$Manifest
     [hashtable]$Parameters
     [hashtable]$Execution
     [string]$WindowsScript
@@ -33,7 +33,7 @@ Class BcAction {
             $outDir = (Get-Item $Path).FullName
 
             # output the manifest
-            $this.Manifest | Out-File $outDir\manifest.txt
+            $this.Manifest.Export("$outDir\manifest.txt", $true)
 
             # output the windows script, if exists
             if ($null -ne $this.WindowsScript) {
