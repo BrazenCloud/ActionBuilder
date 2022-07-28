@@ -49,7 +49,7 @@ Function New-BcOsCommandAction {
             if ($RedirectCommandOutput.IsPresent) {
                 $Command = "$Command >> ./results/out.txt"
             }
-            $action.LinuxScript = $linuxTemplate -replace '\{ if \}', $Command
+            $action.LinuxScript = $linuxTemplate -replace '\{ if \}', $Command -replace '\{ jq \}', ''
         }
     }
     $action
