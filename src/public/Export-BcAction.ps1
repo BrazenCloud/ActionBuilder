@@ -2,7 +2,8 @@ Function Export-BcAction {
     [cmdletbinding()]
     param (
         [string]$ConfigPath,
-        [string]$OutPath
+        [string]$OutPath,
+        [switch]$ClearOutputFolders
     )
     [hashtable[]]$json = Get-Content $ConfigPath | ConvertFrom-Json -AsHashtable
     foreach ($actionHt in $json) {
@@ -23,6 +24,16 @@ Function Export-BcAction {
             }
             default {
                 Write-Warning "Unsupported ActionType"
+            }
+        }
+        if ($ClearOutputFolders.IsPresent) {
+            if (Test-Path "$OutPath\$($actionHt.Name)") {
+                Get-ChildItem "$OutPath\$($actionHt.Name)" -Recurse -File | ForEach-Object {
+                    Remove-Item $_ -Force
+                }
+                Get-ChildItem "$OutPath\$($actionHt.Name)" -Recurse -Directory | ForEach-Object {
+                    Remove-Item $_ -Force
+                }
             }
         }
         $action.Export("$OutPath\$($actionHt.Name)")
