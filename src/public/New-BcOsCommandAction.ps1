@@ -49,19 +49,27 @@ Function New-BcOsCommandAction {
     # then this is simple
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
         if ($Windows.IsPresent) {
+            $wCommand = $Command
+            if ($PSBoundParameters.Key -contains 'DefaultParameters') {
+                $wCommand = "$wCommand $DefaultParameters"
+            }
             if ($RedirectCommandOutput.IsPresent) {
-                $wCommand = "$Command | Out-File .\results\out.txt"
+                $wCommand = "$wCommand | Out-File .\results\out.txt"
             }
             $action.WindowsScript = $windowsTemplate -replace '\{ if \}', $wCommand
         }
         if ($Linux.IsPresent) {
+            $lCommand = $Command
+            if ($PSBoundParameters.Key -contains 'DefaultParameters') {
+                $lCommand = "$lCommand $DefaultParameters"
+            }
             if ($RedirectCommandOutput.IsPresent) {
                 $lCommand = "$Command >> ./results/out.txt"
             }
             $action.LinuxScript = $linuxTemplate.Replace('{ if }', $lCommand).Replace('{ jq }', '')
         }
         # if it has action parameters
-    } elseif ($ActionParameters.Count -gt 0) {
+    } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
 
     }
     $action
