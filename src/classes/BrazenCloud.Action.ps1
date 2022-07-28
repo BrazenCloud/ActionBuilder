@@ -9,9 +9,11 @@ Class BcAction {
 
     [bool] Test() {
         if ($null -eq $this.Manifest) {
+            Write-Warning 'No manifest.'
             return $false
         }
         if ($null -eq $this.WindowsScript -and $null -eq $this.LinuxScript) {
+            Write-Warning 'Missing a script.'
             return $false
         }
         return $true
