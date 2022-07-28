@@ -1,3 +1,3 @@
-if [ ${#{param}} -gt 0 ]; then
+if [ ${param} == "true" ]; then
     {command}
 fi

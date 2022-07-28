@@ -18,6 +18,7 @@ Function New-BcOsCommandAction {
     $linuxTemplate = Get-Template -Name osCommand-Linux
     $windowsIfTemplate = Get-Template -Name osCommand-WindowsIf
     $linuxIfTemplate = Get-Template -Name osCommand-LinuxIf
+    $linuxJqTemplate = Get-Template -Name osCommand-LinuxJq
 
     $action = [BcAction]::new()
     $action.Manifest = [BcManifest]::new()
@@ -73,7 +74,7 @@ Function New-BcOsCommandAction {
             $mcSplat.OS = 'Windows'
             $ifs = foreach ($aParam in $Action.Parameters) {
                 # if this param has a default value, use it, else it must have come from the passed actionParameters var
-                $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$ACtion.Parameters.IndexOf($aParam)]['CommandParameters']
+                $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
                 $windowsIfTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
             }
 
@@ -81,6 +82,23 @@ Function New-BcOsCommandAction {
         }
         if ($Linux.IsPresent) {
             $mcSplat.OS = 'Linux'
+
+            # bash only allows letters, numbers, and underscores in the var name
+            $linuxVarNameReplace = '[^a-zA-Z0-9_]'
+
+            $jqs = foreach ($aParam in $Action.Parameters) {
+                # {bashParam}=$(jq -r '."{param}"' ./settings.json)
+                $linuxJqTemplate.Replace('{bashParam}', ($aParam.Name -replace $linuxVarNameReplace, '')).Replace('{param}', $aParam.Name)
+            }
+
+
+            $ifs = foreach ($aParam in $Action.Parameters) {
+                # if this param has a default value, use it, else it must have come from the passed actionParameters var
+                $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
+                $linuxIfTemplate.Replace('{param}', ($aParam.Name -replace $linuxVarNameReplace, '')).Replace('{command}', (makeCommand @mcSplat))
+            }
+
+            $action.LinuxScript = $linuxTemplate.Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n"))
         }
     }
     $action

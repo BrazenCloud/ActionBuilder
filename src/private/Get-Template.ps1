@@ -20,6 +20,9 @@ Function Get-Template {
                 'LinuxIf' {
                     Get-Content $PSScriptRoot\templates\osCommand\if.sh -Raw
                 }
+                'LinuxJq' {
+                    Get-Content $PSScriptRoot\templates\osCommand\jq.sh -Raw
+                }
             }
         }
     }
