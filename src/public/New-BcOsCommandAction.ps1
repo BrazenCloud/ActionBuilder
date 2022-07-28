@@ -1,4 +1,5 @@
 Function New-BcOsCommandAction {
+    [OutputType('BcAction')]
     [cmdletbinding()]
     param (
         [string]$Name,
@@ -33,6 +34,8 @@ Function New-BcOsCommandAction {
         $pClone.DefaultValue = $DefaultParameters
     }
 
+    $action = [BcAction]::new()
+
     # if no parameters and no includeParametersParameter
     # then this is simple
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
@@ -40,13 +43,14 @@ Function New-BcOsCommandAction {
             if ($RedirectCommandOutput.IsPresent) {
                 $Command = "$Command | Out-File .\results\out.txt"
             }
-            $windowsTemplate -replace '\{ if \}', $Command | Out-File "$OutPath\$Name\windows\script.ps1"
+            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', $Command
         }
         if ($Linux.IsPresent) {
             if ($RedirectCommandOutput.IsPresent) {
                 $Command = "$Command >> ./results/out.txt"
             }
-            $linuxTemplate -replace '\{ if \}', $Command | Out-File "$OutPath\$Name\linux\script.ps1"
+            $action.LinuxScript = $linuxTemplate -replace '\{ if \}', $Command
         }
     }
+    $action
 }
