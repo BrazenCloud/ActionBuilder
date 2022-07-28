@@ -46,34 +46,22 @@ Function New-BcOsCommandAction {
         $action.Manifest.LinuxCommand = $null
     }
 
-    # build default commands
-    if ($Windows.IsPresent) {
-        $wCommand = $Command
-        if ($PSBoundParameters.Key -contains 'DefaultParameters') {
-            $wCommand = "$wCommand $DefaultParameters"
-        }
-        if ($RedirectCommandOutput.IsPresent) {
-            $wCommand = "$wCommand | Out-File .\results\out.txt"
-        }
-    }
-    if ($Linux.IsPresent) {
-        $lCommand = $Command
-        if ($PSBoundParameters.Key -contains 'DefaultParameters') {
-            $lCommand = "$lCommand $DefaultParameters"
-        }
-        if ($RedirectCommandOutput.IsPresent) {
-            $lCommand = "$lCommand >> ./results/out.txt"
-        }
-    }
-
     # if no parameters and no includeParametersParameter
     # then this is simple
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
+        $splat = @{
+            Command    = $Command
+            OS         = ''
+            Redirect   = $RedirectCommandOutput.IsPresent
+            Parameters = $DefaultParameters
+        }
         if ($Windows.IsPresent) {
-            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', $wCommand
+            $splat['OS'] = 'Windows'
+            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', (makeCommand @splat)
         }
         if ($Linux.IsPresent) {
-            $action.LinuxScript = $linuxTemplate.Replace('{ if }', $lCommand).Replace('{ jq }', '')
+            $splat['OS'] = 'Linux'
+            $action.LinuxScript = $linuxTemplate.Replace('{ if }', (makeCommand @splat)).Replace('{ jq }', '')
         }
         # if it has action parameters
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
