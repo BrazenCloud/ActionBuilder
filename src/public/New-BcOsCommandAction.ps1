@@ -23,11 +23,11 @@ Function New-BcOsCommandAction {
     $action.Manifest = [BcManifest]::new()
 
     # Build the parameters
-    foreach ($param in $ActionParameters.Keys) {
+    foreach ($param in $ActionParameters) {
         $newParam = [BcParameter]::new()
         $newParam.Type = 2 # boolean
-        $newParam.Name = $ActionParameters[$param].Name
-        $newParam.Description = $ActionParameters[$param].Description
+        $newParam.Name = $param.Name
+        $newParam.Description = $param.Description
         $action.Parameters += $newParam
     }
 
@@ -71,12 +71,13 @@ Function New-BcOsCommandAction {
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
         if ($Windows.IsPresent) {
             $mcSplat.OS = 'Windows'
-            
-            foreach ($aParam in $Action.Parameters) {
+            $ifs = foreach ($aParam in $Action.Parameters) {
                 # if this param has a default value, use it, else it must have come from the passed actionParameters var
                 $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$ACtion.Parameters.IndexOf($aParam)]['CommandParameters']
-                $newIf = $windowsIfTemplate.Replace('{param}', $aParam.Name).Replace('{command}', (makeCommand @mcSplat))
+                $windowsIfTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
             }
+
+            $action.WindowsScript = $windowsTemplate.Replace('{ if }', ($ifs -join "`n"))
         }
         if ($Linux.IsPresent) {
             $mcSplat.OS = 'Linux'
