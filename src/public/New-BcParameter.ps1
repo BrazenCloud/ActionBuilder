@@ -1,0 +1,27 @@
+Function New-BcParameter {
+    [OutputType('BcParameter')]
+    [cmdletbinding()]
+    param (
+        [string]$Name,
+        [string]$CommandParameters,
+        [string]$Description,
+        [string]$DefaultValue
+    )
+    $param = [BcParameter]::new()
+    $param.Description = $Description
+    $param.Name = $Name
+
+    if ($CommandParameters -match '\{value\}' -or $PSBoundParameters -notcontains 'CommandParameters') {
+        $param.Type = 0 # string
+        $param.Value = $CommandParameters
+    } else {
+        $param.Type = 2 # boolean
+        $param.Value = $CommandParameters
+    }
+
+    if ($PSBoundParameters -contains 'DefaultValue') {
+        $param.DefaultValue = $DefaultValue
+    }
+
+    $param
+}
