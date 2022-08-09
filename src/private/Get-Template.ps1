@@ -41,6 +41,15 @@ Function Get-Template {
                 'WindowsElse' {
                     Get-Content $PSScriptRoot\templates\osCommand\else.ps1
                 }
+                'LinuxIfCombine' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifCombine.sh
+                }
+                'LinuxIfParam' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifParam.sh
+                }
+                'LinuxElse' {
+                    Get-Content $PSScriptRoot\templates\osCommand\else.sh
+                }
             }
         }
     }

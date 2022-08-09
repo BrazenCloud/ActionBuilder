@@ -3,4 +3,4 @@ if ( "{exists}") {
         "{if}"
     }
     & "{command}" $arr
-}
+} "{else}"
