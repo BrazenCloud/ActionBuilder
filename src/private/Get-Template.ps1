@@ -29,6 +29,18 @@ Function Get-Template {
                 'LinuxJq' {
                     Get-Content $PSScriptRoot\templates\osCommand\jq.sh -Raw
                 }
+                'WindowsIf' {
+                    Get-Content $PSScriptRoot\templates\osCommand\if.ps1
+                }
+                'WindowsIfCombine' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifCombine.ps1
+                }
+                'WindowsIfParam' {
+                    Get-Content $PSScriptRoot\templates\osCommand\ifParam.ps1
+                }
+                'WindowsElse' {
+                    Get-Content $PSScriptRoot\templates\osCommand\else.ps1
+                }
             }
         }
     }
