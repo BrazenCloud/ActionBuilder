@@ -5,6 +5,7 @@ class BcAction {
     [hashtable]$Execution
     [string]$WindowsScript
     [string]$LinuxScript
+    [string[]]$ExtraFolders
 
     BcAction() {
         $this.Manifest = [BcManifest]::new()
@@ -66,6 +67,17 @@ class BcAction {
                     New-Item $outDir\linux -ItemType Directory
                 }
                 $this.LinuxScript | Out-File $outDir\linux\script.sh
+            }
+
+            # copy the extra files, if present
+            if ($this.ExtraFolders.Count -gt 0) {
+                foreach ($dir in $this.ExtraFolders) {
+                    if (Test-Path $dir) {
+                        Copy-Item $dir -Destination $outDir
+                    } else {
+                        Write-Warning "Unable to copy '$($this.ExtraFolders)', path does not exist"
+                    }
+                }
             }
         } else {
             Throw 'Test failed. Be sure the action meets the minimum criteria of having both a manifest and at least a Windows or Linux script.'
