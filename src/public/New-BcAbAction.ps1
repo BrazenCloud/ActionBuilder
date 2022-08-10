@@ -65,11 +65,11 @@ Function New-BcAbAction {
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
         if ($OperatingSystems -contains 'Windows') {
             $splat['OS'] = 'Windows'
-            $action.WindowsScript = $windowsTemplate -replace '\{ if \}', (makeCommand @mcSplat)
+            $action.WindowsScript = $templates['Windows']['script'] -replace '\{ if \}', (makeCommand @mcSplat)
         }
         if ($OperatingSystems -contains 'Linux') {
             $splat['OS'] = 'Linux'
-            $action.LinuxScript = $linuxTemplate.Replace('{ if }', (makeCommand @mcSplat)).Replace('{ jq }', '')
+            $action.LinuxScript = $templates['Linux']['script'].Replace('{ if }', (makeCommand @mcSplat)).Replace('{ jq }', '')
         }
         # if it has action parameters
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
@@ -102,7 +102,8 @@ Function New-BcAbAction {
                 $jqs = foreach ($aParam in $Action.Parameters) {
                     # {bashParam}=$(jq -r '."{param}"' ./settings.json)
                     $bashParam = $aParam.Name -replace $linuxVarNameReplace, ''
-                    $linuxJqTemplate.Replace('{bashParam}', $bashParam).Replace('{param}', $aParam.Name)
+                    $templates['Linux']['jq'].Replace('{bashParam}', $bashParam).Replace('{param}', $aParam.Name)
+                    
                 }
 
 
@@ -110,15 +111,15 @@ Function New-BcAbAction {
                     if ($aParam.Type -eq 2) {
                         # if this param has a default value, use it, else it must have come from the passed actionParameters var
                         $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
-                        $linuxIfBoolTemplate.Replace('{param}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
+                        $templates['Linux']['if']['bool'].Replace('{param}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
                     } elseIf ($aParam.Type -eq 0) {
                         $mcSplat.Parameters = "`$$bashParam"
-                        $linuxIfStringTemplate.Replace('{bashParam}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
+                        $templates['Linux']['if']['string'].Replace('{bashParam}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
                     }
                 }
             }
 
-            $action.LinuxScript = $linuxTemplate.Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n"))
+            $action.LinuxScript = $templates['Linux']['script'].Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n"))
         }
     }
     $action
