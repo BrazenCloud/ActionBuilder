@@ -27,7 +27,7 @@ Function New-BcAbCombineScript {
 
     $ifArr = foreach ($param in $Parameters | Where-Object { $_.Name -ne 'Parameters' }) {
         if ($param.Type -eq 2) {
-            $templates[$OperatingSystem]['if']['bool'].Replace('{param}', $Param.Name) -replace '{command}', "`"$($param.GetValue($OperatingSystem))`""
+            $templates[$OperatingSystem]['if']['if'].Replace('{condition}', $Param.GetIsTrueStatement($OperatingSystem)) -replace '{command}', "`"$($param.GetValue($OperatingSystem))`""
         } elseif ($Param.Type -eq 0) {
             $templates[$OperatingSystem]['if']['string'].Replace('{param}', $Param.Name) -replace '{command}', "`"$($param.GetValue($OperatingSystem))`""
         }

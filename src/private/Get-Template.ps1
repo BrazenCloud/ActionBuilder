@@ -8,7 +8,7 @@ Function Get-Template {
             if     = @{
                 if         = @'
 if ({condition}) {
-    {action}
+    {command}
 }
 '@
                 bool       = @'
