@@ -96,7 +96,7 @@ if [ ! -z {param} ]; then
 fi
 '@
                 string     = @'
-if [ ${#{bashParam}} -gt 0 ]; then
+if [ ${#{param}} -gt 0 ]; then
     {command}
 fi
 '@
@@ -155,7 +155,7 @@ fi
 { if }
 '@
             jq     = @'
-{bashParam}=$(jq -r '."{param}"' ./settings.json)
+{param}=$(jq -r '."{param}"' ./settings.json)
 '@
         }
         Manifest = @'
