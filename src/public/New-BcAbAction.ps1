@@ -35,13 +35,13 @@ Function New-BcAbAction {
     $action.Repository.Description = $Description
     $action.Repository.Tags += $Command
     if ($OperatingSystems -contains 'Windows') {
-        $action.Repository.Language = 'OS Command'
+        $action.Repository.Language = 'Generated PowerShell'
         $action.Repository.Tags += 'Windows'
     } else {
         $action.Manifest.WindowsCommand = $null
     }
     if ($OperatingSystems -contains 'Linux') {
-        $action.Repository.Language = 'OS Command'
+        $action.Repository.Language = 'Generated Bash'
         $action.Repository.Tags += 'Linux'
     } else {
         $action.Manifest.LinuxCommand = $null
