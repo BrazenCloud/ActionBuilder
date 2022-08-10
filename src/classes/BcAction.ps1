@@ -42,7 +42,7 @@ class BcAction {
 
             # output the parameters
             if ($this.Parameters.Count -gt 0) {
-                $this.Parameters | ConvertTo-Json -AsArray | Out-File $outDir\parameters.json
+                $this.Parameters | Select-Object -ExcludeProperty "Value" | ConvertTo-Json -AsArray | Out-File $outDir\parameters.json
             }
 
             # output the execution files, if exists
