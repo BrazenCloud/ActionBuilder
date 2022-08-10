@@ -104,6 +104,11 @@ Function New-BcAbAction {
                 }
             }
 
+            $jqs = foreach ($aParam in $Action.Parameters) {
+                # {bashParam}=$(jq -r '."{param}"' ./settings.json)
+                $templates['Linux']['jq'].Replace('{bashParam}', $aParam.GetBashParameterName()).Replace('{param}', $aParam.Name)
+            }
+
             $action.LinuxScript = $templates['Linux']['script'].Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n"))
         }
     }

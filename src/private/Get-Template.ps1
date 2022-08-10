@@ -57,7 +57,7 @@ elseif ( {condition} ) {
             }
             script = @'
 Set-Location $PSScriptRoot
-$settings = Get-Content .\settings.json | ConvertFrom-Json
+$settings = Get-Content ..\settings.json | ConvertFrom-Json
 
 { if }
 '@
@@ -155,7 +155,7 @@ fi
 { if }
 '@
             jq     = @'
-{param}=$(jq -r '."{param}"' ./settings.json)
+{bashParam}=$(jq -r '."{param}"' ../settings.json)
 '@
         }
         Manifest = @'
