@@ -106,7 +106,6 @@ Function New-BcAbAction {
                     
                 }
 
-
                 $ifs = foreach ($aParam in $Action.Parameters) {
                     if ($aParam.Type -eq 2) {
                         # if this param has a default value, use it, else it must have come from the passed actionParameters var
