@@ -1,4 +1,4 @@
-Function New-BcParameter {
+Function New-BcAbParameter {
     [OutputType('BcParameter')]
     [cmdletbinding()]
     param (
@@ -11,7 +11,7 @@ Function New-BcParameter {
     $param.Description = $Description
     $param.Name = $Name
 
-    if ($CommandParameters -match '\{value\}' -or $PSBoundParameters -notcontains 'CommandParameters') {
+    if ($CommandParameters -match '\{value\}' -or $CommandParameters.Length -eq 0) {
         $param.Type = 0 # string
         $param.Value = $CommandParameters
     } else {

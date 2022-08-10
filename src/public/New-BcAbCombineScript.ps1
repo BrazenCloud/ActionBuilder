@@ -26,7 +26,11 @@ Function New-BcAbCombineScript {
     $mainIf = $templates[$OperatingSystem]['if']['combine'] -replace '\{exists\}', ($Parameters.GetIsEmptyStatement($OperatingSystem) -join $orStatement[$OperatingSystem])
 
     $ifArr = foreach ($param in $Parameters | Where-Object { $_.Name -ne 'Parameters' }) {
-        ($templates[$OperatingSystem]['if']['param'] -replace '\{param\}', $Param.Name) -replace '\{value\}', "`"$($param.GetValue($OperatingSystem))`""
+        if ($param.Type -eq 2) {
+            $templates[$OperatingSystem]['if']['bool'].Replace('{param}', $Param.Name) -replace '{command}', "`"$($param.GetValue($OperatingSystem))`""
+        } elseif ($Param.Type -eq 0) {
+            $templates[$OperatingSystem]['if']['string'].Replace('{param}', $Param.Name) -replace '{command}', "`"$($param.GetValue($OperatingSystem))`""
+        }
     }
 
     $mcSplat.Parameters = $DefaultParameters
