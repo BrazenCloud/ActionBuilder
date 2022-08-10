@@ -23,12 +23,12 @@ Function New-BcAbAction {
 
     # Build the parameters
     $action.Parameters = foreach ($param in $ActionParameters) {
-        New-BcParameter @param
+        New-BcAbParameter @param
     }
 
     # Add the default parameters parameter, if requested
     if ($IncludeParametersParameter.IsPresent) {
-        $action.Parameters += New-BcParameter -Name 'Parameters' -DefaultValue $DefaultParameters -Description $ParametersParameterDescription
+        $action.Parameters += New-BcAbParameter -Name 'Parameters' -DefaultValue $DefaultParameters -Description $ParametersParameterDescription
     }
 
     # update repository and manifest

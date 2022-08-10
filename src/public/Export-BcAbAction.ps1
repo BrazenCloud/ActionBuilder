@@ -1,4 +1,4 @@
-Function Export-BcAction {
+Function Export-BcAbAction {
     [cmdletbinding()]
     param (
         [string]$ConfigPath,
