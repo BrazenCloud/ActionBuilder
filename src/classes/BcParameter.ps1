@@ -20,7 +20,7 @@ class BcParameter {
         return "`$settings.'$($this.Name)'.ToString().Length -gt 0"
     }
     [string] GetLinuxIsEmptyStatement() {
-        return "[ ! -z $($this.GetBashParameterName()) ]"
+        return "[ ! -z ""`$$($this.GetBashParameterName())"" ]"
     }
     [string] GetIsEmptyStatement(
         [string]$OperatingSystem

@@ -91,7 +91,7 @@ fi
 '@
                 param      = @'
 if [ ! -z {param} ]; then
-    arr+=("{value}")
+    arr+=({value})
 fi
 '@
                 string     = @'
