@@ -12,7 +12,7 @@ Function New-BcAbAction {
         [string]$DefaultParameters,
         [switch]$RedirectCommandOutput,
         [ValidateSet('Combine', 'All', 'One')]
-        [switch]$ParameterLogic,
+        [string]$ParameterLogic,
         [hashtable[]]$ActionParameters,
         [string[]]$ExtraFolders,
         [string]$OutPath
@@ -85,18 +85,15 @@ Function New-BcAbAction {
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
         if ($OperatingSystems -contains 'Windows') {
             $mcSplat.OS = 'Windows'
-            if ($ParameterLogic -eq 'Combine') {
-                $ifs = New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
-            } else {
-                $ifs = foreach ($aParam in $Action.Parameters) {
-                    # if this param has a default value, use it, else it must have come from the passed actionParameters var
-                    if ($aParam.Type -eq 2) {
-                        $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
-                        $windowsIfBoolTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
-                    } elseif ($aParam.Type -eq 0) {
-                        $mcSplat.Parameters = "`$settings.'$($aParam.Name)'"
-                        $windowsIfStringTemplate.Replace('{param}', $aParam.Name).Replace('"{command}"', (makeCommand @mcSplat))
-                    }
+            $ifs = switch ($ParameterLogic) {
+                'Combine' {
+                    New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                }
+                'All' {
+                    New-BcAbAllScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                }
+                'One' {
+
                 }
             }
 
