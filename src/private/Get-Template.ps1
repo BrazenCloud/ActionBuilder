@@ -6,17 +6,17 @@ Function Get-Template {
     @{
         Windows  = @{
             if     = @{
-                if      = @'
+                if         = @'
 if ({condition}) {
     {action}
 }
 '@
-                bool    = @'
+                bool       = @'
 if ($settings.'{param}'.ToString() -eq 'true') {
     {command}
 }
 '@
-                combine = @'
+                combine    = @'
 if ( {exists} ) {
     $arr = & {
         {if}
@@ -24,25 +24,35 @@ if ( {exists} ) {
     & {command} $arr
 } {else}
 '@
-                ifElse  = @'
+                ifElse     = @'
 if ( {condition} ) {
     {action}
 } {else}
 '@
-                param   = @'
+                param      = @'
 if ($settings.'{param}'.ToString().Length -gt 0) {
     {value}
 }
 '@
-                string  = @'
+                string     = @'
 if ($settings.'{param}'.Length -gt 1) {
     {command}
 }
 '@
-                else    = @'
+                else       = @'
 else {
     {action}
 }
+'@
+                elseIf     = @'
+elseif ( {condition} ) {
+    {action}
+}
+'@
+                elseIfElse = @'
+elseif ( {condition} ) {
+    {action}
+} {else}
 '@
             }
             script = @'
@@ -53,17 +63,17 @@ $settings = Get-Content .\settings.json | ConvertFrom-Json
         }
         Linux    = @{
             if     = @{
-                if      = @'
+                if         = @'
 if {condition} ; then
     {action}
 fi
 '@
-                bool    = @'
+                bool       = @'
 if [ ${param} == "true" ]; then
     {command}
 fi
 '@
-                combine = @'
+                combine    = @'
 declare -a arr
 
 if {exists} ; then
@@ -72,19 +82,33 @@ if {exists} ; then
 {else}
 fi
 '@
-                ifElse  = @'
+                ifElse     = @'
+
+if {condition} ; then
+    {action}
+{else}
 '@
-                param   = @'
+                param      = @'
 if [ ! -z {param} ]; then
     arr+=("{value}")
 fi
 '@
-                string  = @'
+                string     = @'
 if [ ${#{bashParam}} -gt 0 ]; then
     {command}
 fi
 '@
-                else    = @'
+                else       = @'
+'@
+                elseIf     = @'
+elif {condition}; then
+    {action}
+fi
+'@
+                elseIfElse = @'
+elif {condition}; then
+    {action}
+{else}
 '@
             }
             script = @'
