@@ -1,56 +1,140 @@
 Function Get-Template {
+    [cmdletbinding()]
     param (
-        [string]$Name
+        [switch]$All
     )
-    switch ($Name.Split('-')[0]) {
-        'parameters' {
-            Get-Content $PSScriptRoot\templates\parameters.json
-        }
-        'osCommand' {
-            switch ($Name.Split('-')[1]) {
-                'Windows' {
-                    Get-Content $PSScriptRoot\templates\osCommand\windows.ps1 -Raw
-                }
-                'Linux' {
-                    Get-Content $PSScriptRoot\templates\osCommand\linux.sh -Raw
-                }
-                'WindowsIfBool' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifBool.ps1 -Raw
-                }
-                'WindowsIfString' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifString.ps1 -Raw
-                }
-                'LinuxIfBool' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifBool.sh -Raw
-                }
-                'LinuxIfString' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifString.sh -Raw
-                }
-                'LinuxJq' {
-                    Get-Content $PSScriptRoot\templates\osCommand\jq.sh -Raw
-                }
-                'WindowsIf' {
-                    Get-Content $PSScriptRoot\templates\osCommand\if.ps1
-                }
-                'WindowsIfCombine' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifCombine.ps1
-                }
-                'WindowsIfParam' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifParam.ps1
-                }
-                'WindowsElse' {
-                    Get-Content $PSScriptRoot\templates\osCommand\else.ps1
-                }
-                'LinuxIfCombine' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifCombine.sh
-                }
-                'LinuxIfParam' {
-                    Get-Content $PSScriptRoot\templates\osCommand\ifParam.sh
-                }
-                'LinuxElse' {
-                    Get-Content $PSScriptRoot\templates\osCommand\else.sh
-                }
+    @{
+        Windows  = @{
+            if     = @{
+                if      = @'
+if ({condition}) {
+    {action}
+}
+'@
+                bool    = @'
+if ($settings.'{param}'.ToString() -eq 'true') {
+    {command}
+}
+'@
+                combine = @'
+if ( {exists} ) {
+    $arr = & {
+        {if}
+    }
+    & {command} $arr
+} {else}
+'@
+                ifElse  = @'
+if ( {condition} ) {
+    {action}"
+} {else}
+'@
+                param   = @'
+if ($settings.'{param}'.ToString().Length -gt 0) {
+    {value}
+}
+'@
+                string  = @'
+if ($settings.'{param}'.Length -gt 1) {
+    {command}
+}
+'@
+                else    = @'
+else {
+    {action}
+}
+'@
             }
+            script = @'
+$settings = Get-Content .\settings.json | ConvertFrom-Json
+
+{ if }
+'@
         }
+        Linux    = @{
+            if     = @{
+                if      = @'
+if {condition} ; then
+    {action}
+fi
+'@
+                bool    = @'
+if [ ${param} == "true" ]; then
+    {command}
+fi
+'@
+                combine = @'
+declare -a arr
+
+if {exists} ; then
+    {if}
+    {command} ${arr[*]}
+{else}
+fi
+'@
+                ifElse  = @'
+'@
+                param   = @'
+if [ ! -z {param} ]; then
+    arr+=("{value}")
+fi
+'@
+                string  = @'
+if [ ${#{bashParam}} -gt 0 ]; then
+    {command}
+fi
+'@
+                else    = @'
+'@
+            }
+            script = @'
+#!/bin/bash
+
+# check for current package manager
+declare -A osInfo;
+osInfo[/etc/redhat-release]=yum
+osInfo[/etc/arch-release]=pacman
+osInfo[/etc/gentoo-release]=emerge
+osInfo[/etc/SuSE-release]=zypp
+osInfo[/etc/debian_version]=apt-get
+osInfo[/etc/alpine-release]=apk
+
+for f in ${!osInfo[@]}
+do
+    if [[ -f $f ]];then
+        #echo Package manager: ${osInfo[$f]}
+        pman=${osInfo[$f]}
+    fi
+done
+
+# check if jq is installed
+if ! [ -x "$(command -v jq)" ]; then
+    echo "Installing jq"
+
+    # check for sudo, install
+    if [ -x "$(command -v sudo)" ]; then
+        sudo $pman install jq -y
+    else
+        $pman install jq -y
+    fi
+else
+    echo "jq already installed"
+fi
+
+{ jq }
+
+{ if }
+'@
+            jq     = @'
+{bashParam}=$(jq -r '."{param}"' ./settings.json)
+'@
+        }
+        Manifest = @'
+COPY . .
+
+RUN_WIN "powershell.exe -ExecutionPolicy Bypass -File .\windows\script.ps1"
+
+RUN_LIN linux/script.sh
+'@
     }
 }
