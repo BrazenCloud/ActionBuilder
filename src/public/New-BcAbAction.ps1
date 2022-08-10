@@ -11,8 +11,8 @@ Function New-BcAbAction {
         [string]$ParametersParameterDescription,
         [string]$DefaultParameters,
         [switch]$RedirectCommandOutput,
-        [switch]$OneCommandPerParameter,
-        [switch]$CombineAllParameters,
+        [ValidateSet('Combine', 'All', 'One')]
+        [switch]$ParameterLogic,
         [hashtable[]]$ActionParameters,
         [string[]]$ExtraFolders,
         [string]$OutPath
@@ -85,7 +85,7 @@ Function New-BcAbAction {
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
         if ($OperatingSystems -contains 'Windows') {
             $mcSplat.OS = 'Windows'
-            if ($CombineAllParameters.IsPresent) {
+            if ($ParameterLogic -eq 'Combine') {
                 $ifs = New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
             } else {
                 $ifs = foreach ($aParam in $Action.Parameters) {
@@ -105,8 +105,7 @@ Function New-BcAbAction {
         if ($OperatingSystems -contains 'Linux') {
             $mcSplat.OS = 'Linux'
 
-            if ($CombineAllParameters.IsPresent) {
-                Write-Host 'Linux combine'
+            if ($ParameterLogic -eq 'Combine') {
                 $ifs = New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
             } else {
 
