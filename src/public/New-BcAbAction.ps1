@@ -17,17 +17,7 @@ Function New-BcAbAction {
         [string[]]$ExtraFolders,
         [string]$OutPath
     )
-    $windowsTemplate = Get-Template -Name osCommand-Windows
-    $linuxTemplate = Get-Template -Name osCommand-Linux
-    $windowsIfBoolTemplate = Get-Template -Name osCommand-WindowsIfBool
-    $linuxIfBoolTemplate = Get-Template -Name osCommand-LinuxIfBool
-    $linuxJqTemplate = Get-Template -Name osCommand-LinuxJq
-    $windowsIfStringTemplate = Get-Template -Name osCommand-WindowsIfString
-    $linuxIfStringTemplate = Get-Template -Name osCommand-LinuxIfString
-    $windowsIfTemplate = Get-Template -Name osCommand-WindowsIf
-    $windowsIfCombineTemplate = Get-Template -Name osCommand-WindowsIfCombine
-    $windowsIfParamTemplate = Get-Template -Name osCommand-WindowsIfParam
-    $windowsElseTemplate = Get-Template -Name osCommand-WindowsElse
+    $templates = Get-Template -All
 
     $action = [BcAction]::new()
 
@@ -93,11 +83,11 @@ Function New-BcAbAction {
                     New-BcAbAllScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
                 }
                 'One' {
-
+                    New-BcAbOneScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
                 }
             }
 
-            $action.WindowsScript = $windowsTemplate.Replace('{ if }', ($ifs -join "`n"))
+            $action.WindowsScript = $templates['Windows']['script'].Replace('{ if }', ($ifs -join "`n"))
         }
         if ($OperatingSystems -contains 'Linux') {
             $mcSplat.OS = 'Linux'
