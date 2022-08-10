@@ -26,7 +26,7 @@ if ( {exists} ) {
 '@
                 ifElse     = @'
 if ( {condition} ) {
-    {action}
+    {command}
 } {else}
 '@
                 param      = @'
@@ -41,17 +41,17 @@ if ($settings.'{param}'.Length -gt 1) {
 '@
                 else       = @'
 else {
-    {action}
+    {command}
 }
 '@
                 elseIf     = @'
 elseif ( {condition} ) {
-    {action}
+    {command}
 }
 '@
                 elseIfElse = @'
 elseif ( {condition} ) {
-    {action}
+    {command}
 } {else}
 '@
             }
@@ -65,7 +65,7 @@ $settings = Get-Content .\settings.json | ConvertFrom-Json
             if     = @{
                 if         = @'
 if {condition} ; then
-    {action}
+    {command}
 fi
 '@
                 bool       = @'
@@ -85,8 +85,9 @@ fi
                 ifElse     = @'
 
 if {condition} ; then
-    {action}
+    {command}
 {else}
+fi
 '@
                 param      = @'
 if [ ! -z {param} ]; then
@@ -99,15 +100,17 @@ if [ ${#{bashParam}} -gt 0 ]; then
 fi
 '@
                 else       = @'
+else
+    {command}
 '@
                 elseIf     = @'
 elif {condition}; then
-    {action}
+    {command}
 fi
 '@
                 elseIfElse = @'
 elif {condition}; then
-    {action}
+    {command}
 {else}
 '@
             }

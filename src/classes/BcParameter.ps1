@@ -33,10 +33,27 @@ class BcParameter {
             Throw "Unsupported OS value: '$OperatingSystem'"
         }
     }
+    [string] GetWindowsIsTrueStatement() {
+        return "`$settings.'$($this.Name)'.ToString() -eq 'true'"
+    }
+    [string] GetLinuxIsTrueStatement() {
+        return "[ `${$($this.GetBashParameterName())} == ""true"" ]"
+    }
+    [string] GetIsTrueStatement (
+        [string]$OperatingSystem
+    ) {
+        if ($OperatingSystem -eq 'Windows') {
+            return $this.GetWindowsIsTrueStatement()
+        } elseif ($OperatingSystem -eq 'Linux') {
+            return $this.GetLinuxIsTrueStatement()
+        } else {
+            Throw "Unsupported OS value: '$OperatingSystem'"
+        }
+    }
     [string] GetLinuxValue() {
         if ($this.Type -eq 0) {
             if ($this.Value.Length -gt 0) {
-                return $this.Value -replace "\{value\}", "`$$($this.Name)"
+                return $this.Value -replace "\{value\}", "`$$($this.GetBashParameterName())"
             } else {
                 return "`$$($this.Name)"
             }
