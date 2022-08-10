@@ -26,7 +26,7 @@ if ( {exists} ) {
 '@
                 ifElse  = @'
 if ( {condition} ) {
-    {action}"
+    {action}
 } {else}
 '@
                 param   = @'

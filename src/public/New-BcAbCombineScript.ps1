@@ -33,5 +33,5 @@ Function New-BcAbCombineScript {
 
     (($mainIf -replace '\{if\}', ($ifArr -join "`n"))) `
         -replace '\{command\}', $Command `
-        -replace '\{else\}', (($templates[$OperatingSystem]['if']['ifElse'] -replace '\{action\}', (makeCommand @mcSplat)) -join "`n")
+        -replace '\{else\}', (($templates[$OperatingSystem]['if']['else'] -replace '\{action\}', (makeCommand @mcSplat)) -join "`n")
 }
