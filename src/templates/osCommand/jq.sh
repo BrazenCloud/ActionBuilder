@@ -1,1 +1,0 @@
-{bashParam}=$(jq -r '."{param}"' ./settings.json)
