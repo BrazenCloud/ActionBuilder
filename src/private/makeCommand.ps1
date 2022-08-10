@@ -13,12 +13,12 @@ function makeCommand {
     switch ($OS) {
         'Windows' {
             if ($Redirect.IsPresent) {
-                $Command = "$Command | Out-File .\results\out.txt -Append"
+                $Command = "$Command | Out-File ..\results\out.txt -Append"
             }
         }
         'Linux' {
             if ($Redirect.IsPresent) {
-                $Command = "$Command >> ./results/out.txt"
+                $Command = "$Command >> ../results/out.txt"
             }
         }
     }
