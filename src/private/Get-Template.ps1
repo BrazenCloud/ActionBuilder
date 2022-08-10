@@ -56,6 +56,7 @@ elseif ( {condition} ) {
 '@
             }
             script = @'
+Set-Location $PSScriptRoot
 $settings = Get-Content .\settings.json | ConvertFrom-Json
 
 { if }
@@ -116,6 +117,7 @@ elif {condition}; then
             }
             script = @'
 #!/bin/bash
+cd "${0%/*}"
 
 # check for current package manager
 declare -A osInfo;
