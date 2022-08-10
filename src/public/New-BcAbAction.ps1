@@ -92,29 +92,15 @@ Function New-BcAbAction {
         if ($OperatingSystems -contains 'Linux') {
             $mcSplat.OS = 'Linux'
 
-            if ($ParameterLogic -eq 'Combine') {
-                $ifs = New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
-            } else {
-
-                # bash only allows letters, numbers, and underscores in the var name
-                $linuxVarNameReplace = '[^a-zA-Z0-9_]'
-
-                $jqs = foreach ($aParam in $Action.Parameters) {
-                    # {bashParam}=$(jq -r '."{param}"' ./settings.json)
-                    $bashParam = $aParam.Name -replace $linuxVarNameReplace, ''
-                    $templates['Linux']['jq'].Replace('{bashParam}', $bashParam).Replace('{param}', $aParam.Name)
-                    
+            $ifs = switch ($ParameterLogic) {
+                'Combine' {
+                    New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
                 }
-
-                $ifs = foreach ($aParam in $Action.Parameters) {
-                    if ($aParam.Type -eq 2) {
-                        # if this param has a default value, use it, else it must have come from the passed actionParameters var
-                        $mcSplat.Parameters = $null -ne $aParam.DefaultValue ? $aParam.DefaultValue : $ActionParameters[$Action.Parameters.IndexOf($aParam)]['CommandParameters']
-                        $templates['Linux']['if']['bool'].Replace('{param}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
-                    } elseIf ($aParam.Type -eq 0) {
-                        $mcSplat.Parameters = "`$$bashParam"
-                        $templates['Linux']['if']['string'].Replace('{bashParam}', $bashParam).Replace('{command}', (makeCommand @mcSplat))
-                    }
+                'All' {
+                    New-BcAbAllScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                }
+                'One' {
+                    New-BcAbOneScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
                 }
             }
 
