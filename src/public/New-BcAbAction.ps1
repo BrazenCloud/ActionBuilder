@@ -63,12 +63,13 @@ Function New-BcAbAction {
     # if no parameters and no includeParametersParameter
     # then this is simple
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
+        Write-Verbose 'No parameters passed'
         if ($OperatingSystems -contains 'Windows') {
-            $splat['OS'] = 'Windows'
+            $mcSplat['OS'] = 'Windows'
             $action.WindowsScript = $templates['Windows']['script'] -replace '\{ if \}', (makeCommand @mcSplat)
         }
         if ($OperatingSystems -contains 'Linux') {
-            $splat['OS'] = 'Linux'
+            $mcSplat['OS'] = 'Linux'
             $action.LinuxScript = $templates['Linux']['script'].Replace('{ if }', (makeCommand @mcSplat)).Replace('{ jq }', '')
         }
         # if it has action parameters
