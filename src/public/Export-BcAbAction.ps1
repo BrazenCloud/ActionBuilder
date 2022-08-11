@@ -7,6 +7,7 @@ Function Export-BcAbAction {
     )
     [hashtable[]]$json = Get-Content $ConfigPath | ConvertFrom-Json -AsHashtable
     foreach ($actionHt in $json) {
+        Write-Verbose "Starting $($actionHt['Name'])"
         $h = Get-Help New-BcAbAction
         $splat = @{}
         foreach ($parameter in $h.parameters.parameter.Name) {
