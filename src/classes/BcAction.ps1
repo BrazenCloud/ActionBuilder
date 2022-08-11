@@ -73,7 +73,7 @@ class BcAction {
             if ($this.ExtraFolders.Count -gt 0) {
                 foreach ($dir in $this.ExtraFolders) {
                     if (Test-Path $dir) {
-                        Copy-Item $dir -Destination $outDir
+                        Get-ChildItem $dir | Copy-Item -Destination $outDir -Recurse -Force
                     } else {
                         Write-Warning "Unable to copy '$($this.ExtraFolders)', path does not exist"
                     }
