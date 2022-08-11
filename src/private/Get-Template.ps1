@@ -35,7 +35,7 @@ if ($settings.'{param}'.ToString().Length -gt 0) {
 }
 '@
                 string     = @'
-if ($settings.'{param}'.Length -gt 1) {
+if ($settings.'{param}'.Length -gt 0) {
     {command}
 }
 '@
