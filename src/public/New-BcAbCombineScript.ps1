@@ -23,12 +23,19 @@ Function New-BcAbCombineScript {
         Parameters = $DefaultParameters
     }
 
-    $mainIf = $templates[$OperatingSystem]['if']['combine'] -replace '\{exists\}', ($Parameters.GetIsEmptyStatement($OperatingSystem) -join $orStatement[$OperatingSystem])
+    $statements = foreach ($param in $Parameters) {
+        if ($param.Type -eq 2) {
+            $param.GetIsTrueStatement($OperatingSystem)
+        } elseif ($param.Type -eq 0) {
+            $param.GetIsEmptyStatement($OperatingSystem)
+        }
+    }
+    $mainIf = $templates[$OperatingSystem]['if']['combine'] -replace '\{exists\}', $statements -join $orStatement
 
     $ifArr = foreach ($param in $Parameters | Where-Object { $_.Name -ne 'Parameters' }) {
         if ($param.Type -eq 2) {
             $templates[$OperatingSystem]['if']['if'].Replace('{condition}', $Param.GetIsTrueStatement($OperatingSystem)) -replace '{command}', "`"$($param.GetValue($OperatingSystem))`""
-        } elseif ($Param.Type -eq 0) {
+        } elseif ($param.Type -eq 0) {
             $templates[$OperatingSystem]['if']['string'].Replace('{param}', $Param.Name) -replace '{command}', "`"$($param.GetValue($OperatingSystem))`""
         }
     }
