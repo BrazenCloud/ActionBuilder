@@ -21,7 +21,7 @@ if ( {exists} ) {
     $arr = & {
         {if}
     }
-    & {command} $arr
+    & {command}
 } {else}
 '@
                 ifElse     = @'

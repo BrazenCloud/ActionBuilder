@@ -40,9 +40,10 @@ Function New-BcAbCombineScript {
         }
     }
 
-    $mcSplat.Parameters = $DefaultParameters
-
-    (($mainIf -replace '\{if\}', ($ifArr -join "`n"))) `
-        -replace '\{command\}', $Command `
-        -replace '\{else\}', (($templates[$OperatingSystem]['if']['else'] -replace '\{command\}', (makeCommand @mcSplat)) -join "`n")
+    $mcSplat.Parameters = '$arr'
+    $out = (($mainIf -replace '\{if\}', ($ifArr -join "`n"))) `
+        -replace '\{command\}', (makeCommand @mcSplat)
+    
+    $mcSplat['Parameters'] = $DefaultParameters
+    $out -replace '\{else\}', (($templates[$OperatingSystem]['if']['else'] -replace '\{command\}', (makeCommand @mcSplat)) -join "`n")
 }
