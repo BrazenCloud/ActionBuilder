@@ -19,7 +19,7 @@ Function Export-BcAbAction {
                     Remove-Item $_ -Force
                 }
                 Get-ChildItem "$OutPath\$($actionHt.Name)" -Recurse -Directory | ForEach-Object {
-                    Remove-Item $_ -Force
+                    Remove-Item $_ -Recurse -Force
                 }
             }
         }
