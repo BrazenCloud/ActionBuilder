@@ -40,6 +40,9 @@ Function New-BcAbOneScript {
     if ($DefaultParameters.Length -gt 0) {
         $mcSplat.Parameters = $DefaultParameters
         $out = $out.Replace('{else}', $templates[$OperatingSystem]['if']['else'].Replace('{command}', (makeCommand @mcSplat)))
+    } else {
+        $mcSplat.Parameters = $null
+        $out = $out.Replace('{else}', $templates[$OperatingSystem]['if']['else'].Replace('{command}', (makeCommand @mcSplat)))
     }
     $out
 }
