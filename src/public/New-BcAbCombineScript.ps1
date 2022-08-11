@@ -30,7 +30,7 @@ Function New-BcAbCombineScript {
             $param.GetIsEmptyStatement($OperatingSystem)
         }
     }
-    $mainIf = $templates[$OperatingSystem]['if']['combine'] -replace '\{exists\}', $statements -join $orStatement
+    $mainIf = $templates[$OperatingSystem]['if']['combine'] -replace '\{exists\}', ($statements -join $orStatement)
 
     $ifArr = foreach ($param in $Parameters | Where-Object { $_.Name -ne 'Parameters' }) {
         if ($param.Type -eq 2) {
