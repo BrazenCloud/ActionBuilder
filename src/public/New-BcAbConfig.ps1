@@ -60,7 +60,7 @@ Function New-BcAbConfig {
         } elseIf (Test-Path $OutPath -PathType Leaf -and -not $Force.IsPresent) {
             Throw "Output Path: '$OutPath' already exists. Use -Force to overwrite."
         }
-        $ht | ConvertTo-Json | Out-File $OutPath -Force:$Force.IsPresent
+        $ht | ConvertTo-Json -AsArray | Out-File $OutPath -Force:$Force.IsPresent
     } else {
         $ht
     }
