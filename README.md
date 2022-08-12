@@ -34,6 +34,16 @@ Here is the blank template config:
 ]
 ```
 
+## Getting Started
+
+The easiest way to get started is to use `New-BcAbConfig.ps1` cmdlet to create a new blank config:
+
+```powershell
+New-BcAbConfig -Name 'endpoint:ipconfig' -Command 'ipconfig' -OutPath .\testConfig.json
+```
+
+Then you can edit it to your specifications per the details below.
+
 ## Explanation
 
 - **Name**: The name to give the action.
@@ -203,4 +213,39 @@ Here is an example using `binutils`:
     "Name": "binutils",
     "TestCommand": "strings"
 }
+```
+
+## Examples
+
+### chkdisk
+
+```json
+[
+    {
+        "Name": "chkdsk",
+        "Description": "Checks a disk and displays a status report.",
+        "OperatingSystems": [
+            "Windows"
+        ],
+        "Command": "chkdsk",
+        "ExtraFolders": null,
+        "IncludeParametersParameter": true,
+        "ParametersParameterDescription": "If edited, this take precedence over all other parameters.",
+        "DefaultParameters": "C: /scan /I /C",
+        "RedirectCommandOutput": false,
+        "ParameterLogic": "Combine",
+        "ActionParameters": [
+            {
+                "Name": "Volume",
+                "CommandParameters": "{value}",
+                "Description": "Specifies the drive letter (followed by a colon), mount point, or volume name."
+            },
+            {
+                "Name": "Scan",
+                "CommandParameters": "/scan",
+                "Description": "If specified, passes the /scan parameter"
+            }
+        ]
+    }
+]
 ```
