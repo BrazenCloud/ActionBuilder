@@ -15,6 +15,7 @@ Function New-BcAbAction {
         [string]$ParameterLogic,
         [hashtable[]]$ActionParameters,
         [string[]]$ExtraFolders,
+        [hashtable[]]$RequiredPackages,
         [string]$OutPath
     )
     $templates = Get-Template -All
@@ -110,7 +111,15 @@ Function New-BcAbAction {
                 $templates['Linux']['jq'].Replace('{bashParam}', $aParam.GetBashParameterName()).Replace('{param}', $aParam.Name)
             }
 
-            $action.LinuxScript = $templates['Linux']['script'].Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n"))
+            $prereqs = if ($RequiredPackages.Count -gt 0) {
+                foreach ($package in $RequiredPackages) {
+                    $templates['Linux']['prereq'].Replace('{package}', $package.Name).Replace('{testCommand}', $package.TestCommand)
+                }
+            } else {
+                $null
+            }
+
+            $action.LinuxScript = $templates['Linux']['script'].Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n")).Replace('{ prereqs }', $prereqs)
         }
     }
     $action

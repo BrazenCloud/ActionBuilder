@@ -150,12 +150,29 @@ else
     echo "jq already installed"
 fi
 
+{ prereqs }
+
 { jq }
 
 { if }
 '@
             jq     = @'
 {bashParam}=$(jq -r '."{param}"' ../settings.json)
+'@
+            prereq = @'
+# check if {package} is installed
+if ! [ -x "$(command -v {testCommand})" ]; then
+    echo "Installing {package}"
+
+    # check for sudo, install
+    if [ -x "$(command -v sudo)" ]; then
+        sudo $pman install {package} -y
+    else
+        $pman install {package} -y
+    fi
+else
+    echo "{package} already installed"
+fi
 '@
         }
         Manifest = @'
