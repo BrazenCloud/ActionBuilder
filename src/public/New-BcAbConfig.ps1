@@ -16,6 +16,7 @@ Function New-BcAbConfig {
         [ValidateSet('Combine', 'All', 'One')]
         [string]$ParameterLogic = 'Combine',
         [hashtable[]]$ActionParameters,
+        [hashtable[]]$RequiredPackages,
         [string]$OutPath,
         [switch]$Force
     )
@@ -31,6 +32,7 @@ Function New-BcAbConfig {
         RedirectCommandOutput          = $RedirectCommandOutput
         ParameterLogic                 = $ParameterLogic
         ActionParameters               = $ActionParameters
+        RequiredPackages               = $RequiredPackages
     }
 
     if ($PSBoundParameters.Keys -notcontains 'ActionParameters') {
@@ -39,6 +41,15 @@ Function New-BcAbConfig {
                 Name              = ''
                 CommandParameters = ''
                 Description       = ''
+            }
+        )
+    }
+
+    if ($PSBoundParameters.Keys -notcontains 'RequiredPackages') {
+        $ht['RequiredPackages'] = @(
+            [ordered]@{
+                Name        = ''
+                TestCommand = ''
             }
         )
     }
