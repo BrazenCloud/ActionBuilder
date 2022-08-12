@@ -5,7 +5,7 @@ Function New-BcAbConfigActionParameters {
         [string]$CommandParameters,
         [string]$Description
     )
-    @{
+    [ordered]@{
         Name              = $Name
         CommandParameters = $CommandParameters
         Description       = $Description
