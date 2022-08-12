@@ -23,6 +23,12 @@ Here is the blank template config:
                 "CommandParameters": "",
                 "Description": ""
             }
+        ],
+        "RequiredPackages": [
+            {
+                "Name": "",
+                "TestCommand": ""
+            }
         ]
     }
 ]
@@ -41,6 +47,7 @@ Here is the blank template config:
 - **RedirectCommandOutput**: If true, this will redirect stdout from the command to a text file in the results folder.
 - **ParameterLogic**: One of three options: Combine, All, or One. See below for details.
 - **ActionParameters**: An array of parameters to generate. See below for details.
+- **RequiredPackages**: An array of required packages to be installed before the Action executes. See below for details.
 
 ### Action Parameters
 
@@ -179,3 +186,21 @@ Using the same example from before with `ipconfig`, say you have the following p
 ```
 
 And if you have `IncludeParametersParameter` set to true, then the generated action would present 3 parameters in the UI. 2 check boxes for the above values and a blank textbox to be filled in. The script would look through them in the order above with the parameters parameter being last. The first one that has value will be the only one executed.
+
+### RequiredPackages
+
+*Currently this is only implemented for Linux*
+
+Each required package has 2 properties:
+
+- **Name**: The name of the package. This will be passed to the package manager.
+- **TestCommand**: The name of a command to check for using `command`. If the check fails, the package will be installed.
+
+Here is an example using `binutils`:
+
+```json
+{
+    "Name": "binutils",
+    "TestCommand": "strings"
+}
+```
