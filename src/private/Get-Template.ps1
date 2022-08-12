@@ -79,7 +79,7 @@ declare -a arr
 
 if {exists} ; then
     {if}
-    {command} ${arr[*]}
+    {command}
 {else}
 fi
 '@
