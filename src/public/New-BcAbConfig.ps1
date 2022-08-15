@@ -17,22 +17,24 @@ Function New-BcAbConfig {
         [string]$ParameterLogic = 'Combine',
         [hashtable[]]$ActionParameters,
         [hashtable[]]$RequiredPackages,
+        [string[]]$PreCommands,
         [string]$OutPath,
         [switch]$Force
     )
     $ht = [ordered]@{
         Name                           = $Name
-        Description                    = $Description
-        OperatingSystems               = $OperatingSystems
+        Description                    = $Description ? $Description : ""
+        OperatingSystems               = $OperatingSystems ? $OperatingSystems : @("Windows", "Linux")
         Command                        = $Command
-        ExtraFolders                   = $ExtraFolders
-        IncludeParametersParameter     = $IncludeParametersParameter
-        ParametersParameterDescription = $ParametersParameterDescription
-        DefaultParameters              = $DefaultParameters
-        RedirectCommandOutput          = $RedirectCommandOutput
+        ExtraFolders                   = $ExtraFolders ? $ExtraFolders : @()
+        IncludeParametersParameter     = $IncludeParametersParameter ? $IncludeParametersParameter : $false
+        ParametersParameterDescription = $ParametersParameterDescription ? $ParametersParameterDescription : ""
+        DefaultParameters              = $DefaultParameters ? $DefaultParameters : ""
+        RedirectCommandOutput          = $RedirectCommandOutput ? $RedirectCommandOutput : $false
         ParameterLogic                 = $ParameterLogic
         ActionParameters               = $ActionParameters
         RequiredPackages               = $RequiredPackages
+        PreCommands                    = $PreCommands ? $PreCommands : @()
     }
 
     if ($PSBoundParameters.Keys -notcontains 'ActionParameters') {
