@@ -59,6 +59,8 @@ elseif ( {condition} ) {
 Set-Location $PSScriptRoot
 $settings = Get-Content ..\settings.json | ConvertFrom-Json
 
+{ preCommands }
+
 { if }
 '@
         }
@@ -149,6 +151,8 @@ if ! [ -x "$(command -v jq)" ]; then
 else
     echo "jq already installed"
 fi
+
+{ preCommands }
 
 { prereqs }
 

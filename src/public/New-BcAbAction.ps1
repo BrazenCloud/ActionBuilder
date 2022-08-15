@@ -16,6 +16,7 @@ Function New-BcAbAction {
         [hashtable[]]$ActionParameters,
         [string[]]$ExtraFolders,
         [hashtable[]]$RequiredPackages,
+        [string[]]$PreCommands,
         [string]$OutPath
     )
     $templates = Get-Template -All
@@ -61,6 +62,12 @@ Function New-BcAbAction {
         $action.ExtraFolders = $ExtraFolders
     }
 
+    $preCmds = if ($PreCommands.Count -gt 0) {
+        $PreCommands -join "`n"
+    } else {
+        $null
+    }
+
     # if no parameters and no includeParametersParameter
     # then this is simple
     if ($ActionParameters.Count -eq 0 -and -not $IncludeParametersParameter.IsPresent) {
@@ -89,7 +96,7 @@ Function New-BcAbAction {
                 }
             }
 
-            $action.WindowsScript = $templates['Windows']['script'].Replace('{ if }', ($ifs -join "`n"))
+            $action.WindowsScript = $templates['Windows']['script'].Replace('{ preCommands }', $preCmds).Replace('{ if }', ($ifs -join "`n"))
         }
         if ($OperatingSystems -contains 'Linux') {
             $mcSplat.OS = 'Linux'
@@ -119,7 +126,7 @@ Function New-BcAbAction {
                 $null
             }
 
-            $action.LinuxScript = $templates['Linux']['script'].Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n")).Replace('{ prereqs }', $prereqs)
+            $action.LinuxScript = $templates['Linux']['script'].Replace('{ preCommands }', $preCmds).Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n")).Replace('{ prereqs }', $prereqs)
         }
     }
     $action
