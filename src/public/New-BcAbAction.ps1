@@ -103,15 +103,24 @@ Function New-BcAbAction {
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
         if ($OperatingSystems -contains 'Windows') {
             $mcSplat.OS = 'Windows'
+
+            $logicSplat = @{
+                Parameters            = $Action.Parameters
+                Command               = $Command
+                OperatingSystem       = 'Windows'
+                RedirectCommandOutput = $RedirectCommandOutput.IsPresent
+                DefaultParameters     = $DefaultParameters
+            }
+
             $ifs = switch ($ParameterLogic) {
                 'Combine' {
-                    New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                    New-BcAbCombineScript @logicSplat
                 }
                 'All' {
-                    New-BcAbAllScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                    New-BcAbAllScript @logicSplat
                 }
                 'One' {
-                    New-BcAbOneScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Windows' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                    New-BcAbOneScript @logicSplat
                 }
             }
 
@@ -120,15 +129,23 @@ Function New-BcAbAction {
         if ($OperatingSystems -contains 'Linux') {
             $mcSplat.OS = 'Linux'
 
+            $logicSplat = @{
+                Parameters            = $Action.Parameters
+                Command               = $Command
+                OperatingSystem       = 'Linux'
+                RedirectCommandOutput = $RedirectCommandOutput.IsPresent
+                DefaultParameters     = $DefaultParameters
+            }
+
             $ifs = switch ($ParameterLogic) {
                 'Combine' {
-                    New-BcAbCombineScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                    New-BcAbCombineScript @logicSplat
                 }
                 'All' {
-                    New-BcAbAllScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                    New-BcAbAllScript @logicSplat
                 }
                 'One' {
-                    New-BcAbOneScript -Parameters $Action.Parameters -Command $Command -OperatingSystem 'Linux' -RedirectCommandOutput:$RedirectCommandOutput.IsPresent -DefaultParameters $DefaultParameters
+                    New-BcAbOneScript @logicSplat
                 }
             }
 
