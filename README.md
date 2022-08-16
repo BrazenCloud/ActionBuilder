@@ -49,11 +49,11 @@ Then you can edit it to your specifications per the details below.
 
 ## Explanation
 
-- **Name**: The name to give the action.
-- **Description**: The description to give the action.
-- **OperatingSystems**: An array of operating systems to make the Action compatible with. Currently supports: Windows and Linux
-- **Tags**: An array of tags to tag the Action with. This is placed in the repository.json file.
-- **Language**: The language the action is written in. This is placed in the repository.json file.
+- **Name**: The name to give the Action. This is placed in the repository.json file.
+- **Description**: The description to give the Action. This is placed in the repository.json file.
+- **OperatingSystems**: An array of operating systems to make the Action compatible with. Currently supports: Windows and Linux.
+- **Tags**: An array of tags to assign to the Action. This is placed in the repository.json file.
+- **Language**: The language to assign to the Action. This is placed in the repository.json file.
 - **Command**: The command to call to execute the Action.
 - **ExtraFolders**: An array of paths. Each path will be copied to the root of the generated Action. If you need to supply OS specific files, be sure they are in an OS specific folder such as 'Windows' or 'Linux'.
 - **IncludeParametersParameter**: If true, the generated Action will include a string parameter that, when filled, will pass those values to the command as arguments.
