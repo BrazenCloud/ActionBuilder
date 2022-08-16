@@ -5,6 +5,7 @@ Function New-BcAbAction {
         [string]$Name,
         [string]$Description,
         [string[]]$Tags,
+        [string]$Language,
         [string]$Command,
         [ValidateSet('Windows', 'Linux')]
         [string[]]$OperatingSystems,
@@ -38,13 +39,21 @@ Function New-BcAbAction {
     $action.Repository.Description = $Description
     $action.Repository.Tags += $Command
     if ($OperatingSystems -contains 'Windows') {
-        $action.Repository.Language = 'Generated PowerShell'
+        if ($PSBoundParameters.Keys -notcontains 'Language') {
+            $action.Repository.Language = 'Generated PowerShell'
+        } else {
+            $action.Repository.Language = $Language
+        }
         $action.Repository.Tags += 'Windows'
     } else {
         $action.Manifest.WindowsCommand = $null
     }
     if ($OperatingSystems -contains 'Linux') {
-        $action.Repository.Language = 'Generated Bash'
+        if ($PSBoundParameters.Keys -notcontains 'Language') {
+            $action.Repository.Language = 'Generated Bash'
+        } else {
+            $action.Repository.Language = $Language
+        }
         $action.Repository.Tags += 'Linux'
     } else {
         $action.Manifest.LinuxCommand = $null
