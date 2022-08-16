@@ -39,15 +39,24 @@ Function New-BcAbAction {
     }
 
     # update repository and manifest
+    foreach ($tag in $Tags) {
+        if ($action.Repository.Tags -notcontains $tag) {
+            $action.Repository.Tags += $tag
+        }
+    }
+    if ($action.Repository.Tags -notcontains $Command) {
+        $action.Repository.Tags += $Command
+    }
     $action.Repository.Description = $Description
-    $action.Repository.Tags += $Command
     if ($OperatingSystems -contains 'Windows') {
         if (-not $Language.Length -gt 0) {
             $action.Repository.Language = 'Generated PowerShell'
         } else {
             $action.Repository.Language = $Language
         }
-        $action.Repository.Tags += 'Windows'
+        if ($action.Repository.Tags -notcontains 'Windows') {
+            $action.Repository.Tags += 'Windows'
+        }
     } else {
         $action.Manifest.WindowsCommand = $null
     }
@@ -57,15 +66,11 @@ Function New-BcAbAction {
         } else {
             $action.Repository.Language = $Language
         }
-        $action.Repository.Tags += 'Linux'
+        if ($action.Repository.Tags -notcontains 'Linux') {
+            $action.Repository.Tags += 'Linux'
+        }
     } else {
         $action.Manifest.LinuxCommand = $null
-    }
-
-    foreach ($tag in $Tags) {
-        if ($action.Repository.Tags -notcontains $tag) {
-            $action.Repository.Tags += $tag
-        }
     }
 
     # declare splat
