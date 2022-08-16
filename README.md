@@ -119,8 +119,6 @@ This tool can utilize the passed parameters to build out different logic flows i
   - Sequentially runs each selected parameter against the command
 - One
   - Runs the first selected parameter against the command and no other
-- None
-  - Runs the command with default value or no parameters
 
 #### Combine
 
