@@ -19,7 +19,7 @@ Function New-BcAbParameter {
         $param.Value = $CommandParameters
     }
 
-    if ($PSBoundParameters -contains 'DefaultValue') {
+    if ($PSBoundParameters.Keys -contains 'DefaultValue') {
         $param.DefaultValue = $DefaultValue
     }
 
