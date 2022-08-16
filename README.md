@@ -1,4 +1,4 @@
-# BrazenCloud Action Builder
+# BrazenCloud.ActionBuilder
 
 This tool can be used to dynamically produce BrazenCloud actions based on commands, executables, or prebuilt scripts. This is designed to ingest a JSON config and spit out Actions.
 
@@ -9,6 +9,8 @@ Here is the blank template config:
     {
         "Name": "",
         "Description": "",
+        "Tags": [],
+        "Language": "",
         "OperatingSystems": [],
         "Command": "",
         "ExtraFolders": [],
@@ -29,7 +31,8 @@ Here is the blank template config:
                 "Name": "",
                 "TestCommand": ""
             }
-        ]
+        ],
+        "PreCommands": []
     }
 ]
 ```
@@ -49,6 +52,8 @@ Then you can edit it to your specifications per the details below.
 - **Name**: The name to give the action.
 - **Description**: The description to give the action.
 - **OperatingSystems**: An array of operating systems to make the Action compatible with. Currently supports: Windows and Linux
+- **Tags**: An array of tags to tag the Action with. This is placed in the repository.json file.
+- **Language**: The language the action is written in. This is placed in the repository.json file.
 - **Command**: The command to call to execute the Action.
 - **ExtraFolders**: An array of paths. Each path will be copied to the root of the generated Action. If you need to supply OS specific files, be sure they are in an OS specific folder such as 'Windows' or 'Linux'.
 - **IncludeParametersParameter**: If true, the generated Action will include a string parameter that, when filled, will pass those values to the command as arguments.
@@ -58,6 +63,7 @@ Then you can edit it to your specifications per the details below.
 - **ParameterLogic**: One of three options: Combine, All, or One. See below for details.
 - **ActionParameters**: An array of parameters to generate. See below for details.
 - **RequiredPackages**: An array of required packages to be installed before the Action executes. See below for details.
+- **PreCommands**: An array of commands to be run before the main command executes. Each entry represents one command.
 
 ### Action Parameters
 
@@ -103,10 +109,10 @@ The generated Action will present a string parameter in the UI (a textbox) and i
 This tool can utilize the passed parameters to build out different logic flows in the produced script. The different logic flows are:
 
 - Combine
-  - Combines all filled in string parameters or checked boolean parameters to pass to the specified command
-  - If none were passed, default command is run
+  - Combines all filled in string parameters or selected boolean parameters to pass to the specified command
+  - If none were passed, the default command is run
 - All
-  - Runs each selected parameter against the command
+  - Sequentially runs each selected parameter against the command
 - One
   - Runs the first selected parameter against the command and no other
 - None
@@ -141,7 +147,7 @@ For example, if you had a `tshark` action with multiple parameters, such as:
 }
 ```
 
-Then the action, if generated with the combine logic flow, would check each of those parameters for values and if any of them have value, they would be passed as an argument array to the command. So this could end up looking like:
+Then the action, if generated with the combine logic flow, would check each of those parameters for passed values and if any of them have value, they would be passed as an argument array to the command. So this could end up looking like:
 
 ```
 .\tshark.exe -i 4 -w .\out.pcap -a filesize:500 -b filesize:500
@@ -215,6 +221,24 @@ Here is an example using `binutils`:
 }
 ```
 
+This will generate the following code (`$pman` is the dynamically determined package manager):
+
+```bash
+# check if binutils is installed
+if ! [ -x "$(command -v strings)" ]; then
+    echo "Installing binutils"
+
+    # check for sudo, install
+    if [ -x "$(command -v sudo)" ]; then
+        sudo $pman install binutils -y
+    else
+        $pman install binutils -y
+    fi
+else
+    echo "binutils already installed"
+fi
+```
+
 ## Examples
 
 ### chkdisk
@@ -227,6 +251,10 @@ Here is an example using `binutils`:
         "OperatingSystems": [
             "Windows"
         ],
+        "Tags": [
+            "Disk"
+        ],
+        "Language": "Windows Executable",
         "Command": "chkdsk",
         "ExtraFolders": null,
         "IncludeParametersParameter": true,
@@ -245,7 +273,137 @@ Here is an example using `binutils`:
                 "CommandParameters": "/scan",
                 "Description": "If specified, passes the /scan parameter"
             }
-        ]
+        ],
+        "RequiredPackages": [],
+        "PreCommands": []
     }
 ]
+```
+
+This generates the following script:
+
+```powershell
+Set-Location $PSScriptRoot
+$settings = Get-Content ..\settings.json | ConvertFrom-Json
+
+if ( $settings.'Volume'.ToString().Length -gt 0 -or $settings.'Scan'.ToString() -eq 'true' -or $settings.'Parameters'.ToString().Length -gt 0 ) {
+    $arr = & {
+        if ($settings.'Volume'.Length -gt 0) {
+            "$($settings.'Volume')"
+        }
+        if ($settings.'Scan'.ToString() -eq 'true') {
+            "/scan"
+        }
+    }
+    & chkdsk $arr
+} else {
+    chkdsk
+}
+
+```
+
+### debsums
+
+```json
+[
+    {
+        "Name": "debsums",
+        "Description": "Validate Linux Packages with Debsums",
+        "Tags": [
+            "Inventory",
+            "Packages",
+            "Validation"
+        ],
+        "Language": "",
+        "OperatingSystems": [
+            "Linux"
+        ],
+        "Command": "debsums",
+        "ExtraFolders": null,
+        "IncludeParametersParameter": true,
+        "ParametersParameterDescription": "",
+        "DefaultParameters": "",
+        "RedirectCommandOutput": true,
+        "ParameterLogic": "One",
+        "ActionParameters": [
+            {
+                "Name": "Silent",
+                "CommandParameters": "-s",
+                "Description": "Silences OK packages."
+            }
+        ],
+        "RequiredPackages": [
+            {
+                "Name": "debsums",
+                "TestCommand": "debsums"
+            }
+        ],
+        "PreCommands": []
+    }
+]
+```
+
+This will produce the following script:
+
+```bash
+#!/bin/bash
+cd "${0%/*}"
+
+# check for current package manager
+declare -A osInfo;
+osInfo[/etc/redhat-release]=yum
+osInfo[/etc/arch-release]=pacman
+osInfo[/etc/gentoo-release]=emerge
+osInfo[/etc/SuSE-release]=zypp
+osInfo[/etc/debian_version]=apt-get
+osInfo[/etc/alpine-release]=apk
+
+for f in ${!osInfo[@]}
+do
+    if [[ -f $f ]];then
+        #echo Package manager: ${osInfo[$f]}
+        pman=${osInfo[$f]}
+    fi
+done
+
+# check if jq is installed
+if ! [ -x "$(command -v jq)" ]; then
+    echo "Installing jq"
+
+    # check for sudo, install
+    if [ -x "$(command -v sudo)" ]; then
+        sudo $pman install jq -y
+    else
+        $pman install jq -y
+    fi
+else
+    echo "jq already installed"
+fi
+
+# check if debsums is installed
+if ! [ -x "$(command -v debsums)" ]; then
+    echo "Installing debsums"
+
+    # check for sudo, install
+    if [ -x "$(command -v sudo)" ]; then
+        sudo $pman install debsums -y
+    else
+        $pman install debsums -y
+    fi
+else
+    echo "debsums already installed"
+fi
+
+Silent=$(jq -r '."Silent"' ../settings.json)
+Parameters=$(jq -r '."Parameters"' ../settings.json)
+
+
+if [ ${Silent} == "true" ] ; then
+    debsums -s >> ../results/out.txt
+elif [ ! -z "$Parameters" ]; then
+    debsums $Parameters >> ../results/out.txt
+else
+    debsums >> ../results/out.txt
+fi
+
 ```
