@@ -31,6 +31,9 @@ Function New-BcAbAction {
     }
 
     # Add the default parameters parameter, if requested
+    if (-not $ParametersParameterDescription.Length -gt 0) {
+        $ParametersParameterDescription = 'Parameters typed here are passed directly to the command.'
+    }
     if ($IncludeParametersParameter.IsPresent) {
         $action.Parameters += New-BcAbParameter -Name 'Parameters' -DefaultValue $DefaultParameters -Description $ParametersParameterDescription
     }
@@ -39,7 +42,7 @@ Function New-BcAbAction {
     $action.Repository.Description = $Description
     $action.Repository.Tags += $Command
     if ($OperatingSystems -contains 'Windows') {
-        if ($PSBoundParameters.Keys -notcontains 'Language') {
+        if (-not $Language.Length -gt 0) {
             $action.Repository.Language = 'Generated PowerShell'
         } else {
             $action.Repository.Language = $Language
@@ -49,7 +52,7 @@ Function New-BcAbAction {
         $action.Manifest.WindowsCommand = $null
     }
     if ($OperatingSystems -contains 'Linux') {
-        if ($PSBoundParameters.Keys -notcontains 'Language') {
+        if (-not $Language.Length -gt 0) {
             $action.Repository.Language = 'Generated Bash'
         } else {
             $action.Repository.Language = $Language
