@@ -26,7 +26,7 @@ Function New-BcAbOneScript {
         $templates[$OperatingSystem]['if']['ifElse'].Replace('{condition}', $Parameters[0].GetIsEmptyStatement($OperatingSystem)) -replace '{command}', (makeCommand @mcSplat)
     }
 
-    for ($x = 1; $x -lt $Parameters.Count - 1; $x++) {
+    for ($x = 1; $x -lt $Parameters.Count; $x++) {
         # if this param has a default value, use it, else it must have come from the passed actionParameters var
         $ifStr = if ($Parameters[$x].Type -eq 2) {
             $mcSplat.Parameters = $Parameters[$x].GetValue($OperatingSystem)
