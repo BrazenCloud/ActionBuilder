@@ -4,6 +4,7 @@ Function New-BcAbAction {
     param (
         [string]$Name,
         [string]$Description,
+        [string[]]$Tags,
         [string]$Command,
         [ValidateSet('Windows', 'Linux')]
         [string[]]$OperatingSystems,
@@ -47,6 +48,12 @@ Function New-BcAbAction {
         $action.Repository.Tags += 'Linux'
     } else {
         $action.Manifest.LinuxCommand = $null
+    }
+
+    foreach ($tag in $Tags) {
+        if ($action.Repository.Tags -notcontains $tag) {
+            $action.Repository.Tags += $tag
+        }
     }
 
     # declare splat
