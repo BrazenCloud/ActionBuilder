@@ -30,12 +30,15 @@ Function New-BcAbAction {
         New-BcAbParameter @param
     }
 
+    # Get Required Parameters
+    $reqParams = $action.Parameters | Where-Object { $_.IsOptional -eq $false }
+
     # Add the default parameters parameter, if requested
     if (-not $ParametersParameterDescription.Length -gt 0) {
         $ParametersParameterDescription = 'Parameters typed here are passed directly to the command.'
     }
     if ($IncludeParametersParameter.IsPresent) {
-        $action.Parameters += New-BcAbParameter -Name 'Parameters' -DefaultValue $DefaultParameters -Description $ParametersParameterDescription
+        $action.Parameters += New-BcAbParameter -Name 'Custom Parameters' -DefaultValue $DefaultParameters -Description $ParametersParameterDescription
     }
 
     # update repository and manifest
@@ -75,10 +78,11 @@ Function New-BcAbAction {
 
     # declare splat
     $mcSplat = @{
-        Command    = $Command
-        OS         = ''
-        Redirect   = $RedirectCommandOutput.IsPresent
-        Parameters = $DefaultParameters
+        Command            = $Command
+        OS                 = ''
+        Redirect           = $RedirectCommandOutput.IsPresent
+        Parameters         = $DefaultParameters
+        RequiredParameters = $reqParams
     }
 
     # add extra folder if passed

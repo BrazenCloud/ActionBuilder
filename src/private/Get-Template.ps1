@@ -6,50 +6,55 @@ Function Get-Template {
     @{
         Windows  = @{
             if     = @{
-                if         = @'
+                if                 = @'
 if ({condition}) {
     {command}
 }
 '@
-                bool       = @'
+                bool               = @'
 if ($settings.'{param}'.ToString() -eq 'true') {
     {command}
 }
 '@
-                combine    = @'
-if ( {exists} ) {
+                combine            = @'
+{customParam}if ( {exists} ) {
     $arr = & {
         {if}
     }
     & {command}
 } {else}
 '@
-                ifElse     = @'
+                combineCustomParam = @'
+if ({condition}) {
+    & {command}
+} else
+'@
+                ifElse             = @'
 if ( {condition} ) {
     {command}
 } {else}
 '@
-                param      = @'
+                param              = @'
 if ($settings.'{param}'.ToString().Length -gt 0) {
     {value}
 }
 '@
-                string     = @'
+                string             = @'
 if ($settings.'{param}'.Length -gt 0) {
     {command}
 }
 '@
-                else       = @'
+                else               = @'
 else {
     {command}
 }
 '@
-                elseIf     = @'
+                elseIf             = @'
 elseif ( {condition} ) {
     {command}
 }
 '@
-                elseIfElse = @'
+                elseIfElse         = @'
 elseif ( {condition} ) {
     {command}
 } {else}
@@ -66,52 +71,57 @@ $settings = Get-Content ..\settings.json | ConvertFrom-Json
         }
         Linux    = @{
             if     = @{
-                if         = @'
+                if                 = @'
 if {condition} ; then
     {command}
 fi
 '@
-                bool       = @'
+                bool               = @'
 if [ ${param} == "true" ]; then
     {command}
 fi
 '@
-                combine    = @'
+                combine            = @'
 declare -a arr
 
-if {exists} ; then
+{customParam}if {exists} ; then
     {if}
     {command}
 {else}
 fi
 '@
-                ifElse     = @'
+                combineCustomParam = @'
+if {condition}; then
+    {command}
+el
+'@
+                ifElse             = @'
 
 if {condition} ; then
     {command}
 {else}
 fi
 '@
-                param      = @'
+                param              = @'
 if [ ! -z {param} ]; then
     arr+=({value})
 fi
 '@
-                string     = @'
+                string             = @'
 if [ ${#{param}} -gt 0 ]; then
     {command}
 fi
 '@
-                else       = @'
+                else               = @'
 else
     {command}
 '@
-                elseIf     = @'
+                elseIf             = @'
 elif {condition}; then
     {command}
 fi
 '@
-                elseIfElse = @'
+                elseIfElse         = @'
 elif {condition}; then
     {command}
 {else}
