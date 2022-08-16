@@ -98,11 +98,11 @@ Function New-BcAbAction {
         Write-Verbose 'No parameters passed'
         if ($OperatingSystems -contains 'Windows') {
             $mcSplat['OS'] = 'Windows'
-            $action.WindowsScript = $templates['Windows']['script'] -replace '\{ if \}', (makeCommand @mcSplat)
+            $action.WindowsScript = $templates['Windows']['script'].Replace('{ preCommands }', $preCmds).Replace('{ if }', (makeCommand @mcSplat))
         }
         if ($OperatingSystems -contains 'Linux') {
             $mcSplat['OS'] = 'Linux'
-            $action.LinuxScript = $templates['Linux']['script'].Replace('{ if }', (makeCommand @mcSplat)).Replace('{ jq }', '')
+            $action.LinuxScript = $templates['Linux']['script'].Replace('{ preCommands }', $preCmds).Replace('{ if }', (makeCommand @mcSplat)).Replace('{ jq }', '')
         }
         # if it has action parameters
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
@@ -114,7 +114,7 @@ Function New-BcAbAction {
                 Command               = $Command
                 OperatingSystem       = 'Windows'
                 RedirectCommandOutput = $RedirectCommandOutput.IsPresent
-                DefaultParameters     = $DefaultParameters
+                DefaultParameters     = $IncludeParametersParameter ? $null : $DefaultParameters
             }
 
             $ifs = switch ($ParameterLogic) {
@@ -139,7 +139,7 @@ Function New-BcAbAction {
                 Command               = $Command
                 OperatingSystem       = 'Linux'
                 RedirectCommandOutput = $RedirectCommandOutput.IsPresent
-                DefaultParameters     = $DefaultParameters
+                DefaultParameters     = $IncludeParametersParameter ? $null : $DefaultParameters
             }
 
             $ifs = switch ($ParameterLogic) {
