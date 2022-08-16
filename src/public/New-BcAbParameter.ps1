@@ -5,7 +5,8 @@ Function New-BcAbParameter {
         [string]$Name,
         [string]$CommandParameters,
         [string]$Description,
-        [string]$DefaultValue
+        [string]$DefaultValue,
+        [bool]$Required = $false
     )
     $param = [BcParameter]::new()
     $param.Description = $Description
@@ -21,6 +22,10 @@ Function New-BcAbParameter {
 
     if ($PSBoundParameters.Keys -contains 'DefaultValue') {
         $param.DefaultValue = $DefaultValue
+    }
+
+    if ($Required) {
+        $param.IsOptional = $false
     }
 
     $param
