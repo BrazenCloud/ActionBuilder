@@ -44,8 +44,8 @@ Function New-BcAbAction {
             $action.Repository.Tags += $tag
         }
     }
-    if ($action.Repository.Tags -notcontains $Command) {
-        $action.Repository.Tags += $Command
+    if ($action.Repository.Tags -notcontains $Name) {
+        $action.Repository.Tags += $Name
     }
     $action.Repository.Description = $Description
     if ($OperatingSystems -contains 'Windows') {
