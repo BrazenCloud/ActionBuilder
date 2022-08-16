@@ -67,12 +67,12 @@ Then you can edit it to your specifications per the details below.
 
 ### Action Parameters
 
-Due to the complexity of implementing other potential parameter types, the Action Builder can only produce two types of parameters with very narrow use cases.
+Due to the complexity of implementing other potential parameter types, the Action Builder can currently produce two types of parameters with specific, but broad, use cases.
 
 - Bool specified value
-  - Presented as boolean and the script passes a specified value to the command
+  - Presented as a boolean and the script passes a config specified value to the command
 - String - passed value
-  - Presented as a string and the script passes the string combined with a specified value
+  - Presented as a string (textbox) and the script passes the string combined with a config specified value
 
 #### Bool
 
@@ -86,7 +86,11 @@ A boolean parameter for an `ipconfig` Action might look like:
 }
 ```
 
-The generated Action will preset a boolean parameter in the UI (checkbox) and if that box is checked, the `/all` argument will be passed to the command.
+The generated Action will preset a boolean parameter in the UI (checkbox) and if that box is checked, the `/all` argument will be passed to the command. So you might end up with:
+
+```
+ipconfig /all
+```
 
 #### String
 
