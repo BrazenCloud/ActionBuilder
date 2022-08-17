@@ -55,7 +55,7 @@ class BcParameter {
             if ($this.Value.Length -gt 0) {
                 return $this.Value -replace "\{value\}", "`$$($this.GetBashParameterName())"
             } else {
-                return "`$$($this.Name)"
+                return "`$$($this.GetBashParameterName())"
             }
         } else {
             return $this.Value
