@@ -47,7 +47,7 @@ Function New-BcAbConfig {
                 Name              = ''
                 CommandParameters = ''
                 Description       = ''
-                Required          = ''
+                Required          = $false
             }
         )
     }
