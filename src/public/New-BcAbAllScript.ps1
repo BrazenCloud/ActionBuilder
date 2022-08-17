@@ -20,10 +20,14 @@ Function New-BcAbAllScript {
         # if this param has a default value, use it, else it must have come from the passed actionParameters var
         if ($param.Type -eq 2) {
             $mcSplat.Parameters = $param.GetValue($OperatingSystem)
-            $templates[$OperatingSystem]['if']['bool'].Replace('{param}', $Param.Name) -replace '"?{command}"?', (makeCommand @mcSplat)
+            $templates[$OperatingSystem]['if']['bool'] `
+                -replace '{param}', $Param.Name `
+                -replace '"?{command}"?', (makeCommand @mcSplat)
         } elseif ($Param.Type -eq 0) {
             $mcSplat.Parameters = $param.GetValue($OperatingSystem)
-            $templates[$OperatingSystem]['if']['string'].Replace('{param}', $Param.Name) -replace '{command}', (makeCommand @mcSplat)
+            $templates[$OperatingSystem]['if']['string'] `
+                -replace '{param}', $Param.Name `
+                -replace '{command}', (makeCommand @mcSplat)
         }
     }
     $Parameters | Where-Object { $_.Name -eq 'Parameters' } | ForEach-Object {
