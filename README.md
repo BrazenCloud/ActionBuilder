@@ -4,6 +4,14 @@
 
 This tool can be used to dynamically produce BrazenCloud actions based on commands, executables, or prebuilt scripts. This is designed to ingest a JSON config and spit out Actions.
 
+## Installation
+
+```powershell
+Install-Module BrazenCloud.ActionBuilder -AllowPrerelease -Repository PSGallery
+```
+
+## Config sample
+
 Here is the blank template config:
 
 ```json
@@ -49,6 +57,12 @@ New-BcAbConfig -Name 'endpoint:ipconfig' -Command 'ipconfig' -OutPath .\testConf
 ```
 
 Then you can edit it to your specifications per the details below.
+
+Once you have it customized to meet your needs, you can export the action (or multiple actions) using:
+
+```powershell
+Export-BcAbConfig -ConfigPath ./testConfig.json -OutPath ~/actions
+```
 
 ## Explanation
 
