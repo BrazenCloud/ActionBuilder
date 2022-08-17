@@ -9,8 +9,6 @@ Function New-BcAbOneScript {
         [string]$DefaultParameters
     )
 
-    $templates = Get-Template -All
-
     $mcSplat = @{
         Command    = $Command
         OS         = $OperatingSystem

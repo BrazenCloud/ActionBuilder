@@ -9,8 +9,6 @@ Function New-BcAbCombineScript {
         [string]$DefaultParameters
     )
 
-    $templates = Get-Template -All
-
     $orStatement = @{
         Windows = ' -or '
         Linux   = ' || '

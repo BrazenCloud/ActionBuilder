@@ -21,7 +21,6 @@ Function New-BcAbAction {
         [string[]]$PreCommands,
         [string]$OutPath
     )
-    $templates = Get-Template -All
 
     $action = [BcAction]::new()
 
