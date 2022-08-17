@@ -66,7 +66,7 @@ class BcAction {
                 if (-not (Test-Path $outDir\linux)) {
                     New-Item $outDir\linux -ItemType Directory
                 }
-                $this.LinuxScript | Out-File $outDir\linux\script.sh
+                ($this.LinuxScript.Replace("`r", '')) -join "`n" | Out-File $outDir\linux\script.sh
             }
 
             # copy the extra files, if present
