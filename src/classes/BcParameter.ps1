@@ -37,7 +37,7 @@ class BcParameter {
         return "`$settings.'$($this.Name)'.ToString() -eq 'true'"
     }
     [string] GetLinuxIsTrueStatement() {
-        return "[ `${$($this.GetBashParameterName())} == ""true"" ]"
+        return "[[ `${$($this.GetBashParameterName())} == ""true"" ]]"
     }
     [string] GetIsTrueStatement (
         [string]$OperatingSystem
