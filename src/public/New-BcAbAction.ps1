@@ -37,7 +37,12 @@ Function New-BcAbAction {
         $ParametersParameterDescription = 'Parameters typed here are passed directly to the command.'
     }
     if ($IncludeParametersParameter.IsPresent) {
-        $action.Parameters += New-BcAbParameter -Name 'Custom Parameters' -DefaultValue $DefaultParameters -Description $ParametersParameterDescription
+        $paramSplat = @{
+            Name         = 'Custom Parameters'
+            DefaultValue = $DefaultParameters
+            Description  = $ParametersParameterDescription
+        }
+        $action.Parameters += New-BcAbParameter @paramSplat
     }
 
     # update repository and manifest
@@ -101,11 +106,16 @@ Function New-BcAbAction {
         Write-Verbose 'No parameters passed'
         if ($OperatingSystems -contains 'Windows') {
             $mcSplat['OS'] = 'Windows'
-            $action.WindowsScript = $templates['Windows']['script'].Replace('{ preCommands }', $preCmds).Replace('{ if }', (makeCommand @mcSplat))
+            $action.WindowsScript = $templates['Windows']['script'] `
+                -replace '\{ preCommands \}', $preCmds `
+                -replace '\{ if \}', (makeCommand @mcSplat)
         }
         if ($OperatingSystems -contains 'Linux') {
             $mcSplat['OS'] = 'Linux'
-            $action.LinuxScript = $templates['Linux']['script'].Replace('{ preCommands }', $preCmds).Replace('{ if }', (makeCommand @mcSplat)).Replace('{ jq }', '')
+            $action.LinuxScript = $templates['Linux']['script'] `
+                -replace '\{ preCommands \}', $preCmds `
+                -replace '\{ if \}', (makeCommand @mcSplat) `
+                -replace '\{ jq \}', ''
         }
         # if it has action parameters
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
@@ -125,7 +135,9 @@ Function New-BcAbAction {
 
             $jqs = if ($os -eq 'Linux') {
                 foreach ($aParam in $Action.Parameters) {
-                    $templates['Linux']['jq'].Replace('{bashParam}', $aParam.GetBashParameterName()).Replace('{param}', $aParam.Name)
+                    $templates['Linux']['jq'] `
+                        -replace '\{bashParam\}', $aParam.GetBashParameterName() `
+                        -replace '\{param\}', $aParam.Name
                 }
             } else {
                 $null
@@ -134,7 +146,9 @@ Function New-BcAbAction {
             $prereqs = if ($os -eq 'Linux') {
                 if ($RequiredPackages.Count -gt 0) {
                     foreach ($package in $RequiredPackages) {
-                        $templates['Linux']['prereq'].Replace('{package}', $package.Name).Replace('{testCommand}', $package.TestCommand)
+                        $templates['Linux']['prereq'] `
+                            -replace '\{package\}', $package.Name `
+                            -replace '\{testCommand\}', $package.TestCommand
                     }
                 } else {
                     $null
@@ -144,7 +158,14 @@ Function New-BcAbAction {
             }
             
 
-            $action.SetScript($os, ($templates[$os]['script'].Replace('{ preCommands }', $preCmds).Replace('{ jq }', ($jqs -join "`n")).Replace('{ prereqs }', $prereqs).Replace('{ if }', ($ifs -join "`n"))))
+            $action.SetScript($os, (
+                    $templates[$os]['script'] `
+                        -replace '\{ preCommands \}', $preCmds `
+                        -replace '\{ jq \}', ($jqs -join "`n") `
+                        -replace '\{ prereqs \}', $prereqs `
+                        -replace '\{ if \}', ($ifs -join "`n")
+                )
+            )
         }
     }
     $action
