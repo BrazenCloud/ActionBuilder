@@ -162,9 +162,9 @@ else
     echo "jq already installed"
 fi
 
-{ preCommands }
-
 { prereqs }
+
+{ preCommands }
 
 { jq }
 
