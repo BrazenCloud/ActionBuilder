@@ -285,7 +285,7 @@ fi
 ]
 ```
 
-This generates the following script:
+This will generate all required files (manifest, repository, etc) as well as the following script:
 
 ```powershell
 Set-Location $PSScriptRoot
@@ -348,7 +348,7 @@ if ($settings.'Custom Parameters'.ToString().Length -gt 0) {
 ]
 ```
 
-This will produce the following script:
+This will generate all required files (manifest, repository, etc) as well as the following script:
 
 ```bash
 #!/bin/bash
