@@ -49,7 +49,7 @@ Function New-BcAbCombineScript {
         if ($param.Type -eq 2) {
             $templates[$OperatingSystem]['if']['if'].Replace('{condition}', $Param.GetIsTrueStatement($OperatingSystem)) -replace '{command}', ($OperatingSystem -eq 'Linux' ? "arr+=(""$($param.GetValue($OperatingSystem))"")" : "`"$($param.GetValue($OperatingSystem))`"")
         } elseif ($param.Type -eq 0) {
-            $templates[$OperatingSystem]['if']['string'].Replace('{param}', $Param.Name) -replace '{command}', ($OperatingSystem -eq 'Linux' ? "arr+=(""$($param.GetValue($OperatingSystem))"")" : "`"$($param.GetValue($OperatingSystem))`"")
+            $templates[$OperatingSystem]['if']['if'].Replace('{condition}', $Param.GetIsEmptyStatement($OperatingSystem)) -replace '{command}', ($OperatingSystem -eq 'Linux' ? "arr+=(""$($param.GetValue($OperatingSystem))"")" : "`"$($param.GetValue($OperatingSystem))`"")
         }
     }
 
