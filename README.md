@@ -1,5 +1,7 @@
 # BrazenCloud.ActionBuilder
 
+[![Runway](https://img.shields.io/powershellgallery/v/BrazenCloud.ActionBuilder.svg?style=flat-square&label=BrazenCloud.ActionBuilder "BrazenCloud.ActionBuilder")](https://www.powershellgallery.com/packages/BrazenCloud.ActionBuilder/)
+
 This tool can be used to dynamically produce BrazenCloud actions based on commands, executables, or prebuilt scripts. This is designed to ingest a JSON config and spit out Actions.
 
 Here is the blank template config:
@@ -23,7 +25,8 @@ Here is the blank template config:
             {
                 "Name": "",
                 "CommandParameters": "",
-                "Description": ""
+                "Description": "",
+                "Required": false
             }
         ],
         "RequiredPackages": [
