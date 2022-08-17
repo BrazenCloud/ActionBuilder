@@ -84,4 +84,21 @@ class BcAction {
         }
 
     }
+
+    SetScript(
+        [string]$OperatingSystem,
+        [string]$Script
+    ) {
+        switch ($OperatingSystem) {
+            'Windows' {
+                $this.WindowsScript = $Script
+            }
+            'Linux' {
+                $this.LinuxScript = $Script
+            }
+            default {
+                Throw "Unsupported OS. Use either 'Windows' or 'Linux'"
+            }
+        }
+    }
 }

@@ -109,68 +109,42 @@ Function New-BcAbAction {
         }
         # if it has action parameters
     } elseif ($ActionParameters.Count -gt 0 -or $IncludeParametersParameter) {
-        if ($OperatingSystems -contains 'Windows') {
-            $mcSplat.OS = 'Windows'
+        foreach ($os in $OperatingSystems) {
+            $mcSplat.OS = $os
 
             $logicSplat = @{
                 Parameters            = $Action.Parameters
                 Command               = $Command
-                OperatingSystem       = 'Windows'
+                OperatingSystem       = $os
                 RedirectCommandOutput = $RedirectCommandOutput.IsPresent
                 DefaultParameters     = $IncludeParametersParameter ? $null : $DefaultParameters
+                Type                  = $ParameterLogic
             }
 
-            $ifs = switch ($ParameterLogic) {
-                'Combine' {
-                    New-BcAbCombineScript @logicSplat
-                }
-                'All' {
-                    New-BcAbAllScript @logicSplat
-                }
-                'One' {
-                    New-BcAbOneScript @logicSplat
-                }
-            }
+            $ifs = New-BcAbScript @logicSplat
 
-            $action.WindowsScript = $templates['Windows']['script'].Replace('{ preCommands }', $preCmds).Replace('{ if }', ($ifs -join "`n"))
-        }
-        if ($OperatingSystems -contains 'Linux') {
-            $mcSplat.OS = 'Linux'
-
-            $logicSplat = @{
-                Parameters            = $Action.Parameters
-                Command               = $Command
-                OperatingSystem       = 'Linux'
-                RedirectCommandOutput = $RedirectCommandOutput.IsPresent
-                DefaultParameters     = $IncludeParametersParameter ? $null : $DefaultParameters
-            }
-
-            $ifs = switch ($ParameterLogic) {
-                'Combine' {
-                    New-BcAbCombineScript @logicSplat
-                }
-                'All' {
-                    New-BcAbAllScript @logicSplat
-                }
-                'One' {
-                    New-BcAbOneScript @logicSplat
-                }
-            }
-
-            $jqs = foreach ($aParam in $Action.Parameters) {
-                # {bashParam}=$(jq -r '."{param}"' ./settings.json)
-                $templates['Linux']['jq'].Replace('{bashParam}', $aParam.GetBashParameterName()).Replace('{param}', $aParam.Name)
-            }
-
-            $prereqs = if ($RequiredPackages.Count -gt 0) {
-                foreach ($package in $RequiredPackages) {
-                    $templates['Linux']['prereq'].Replace('{package}', $package.Name).Replace('{testCommand}', $package.TestCommand)
+            $jqs = if ($os -eq 'Linux') {
+                foreach ($aParam in $Action.Parameters) {
+                    $templates['Linux']['jq'].Replace('{bashParam}', $aParam.GetBashParameterName()).Replace('{param}', $aParam.Name)
                 }
             } else {
                 $null
             }
 
-            $action.LinuxScript = $templates['Linux']['script'].Replace('{ preCommands }', $preCmds).Replace('{ jq }', ($jqs -join "`n")).Replace('{ if }', ($ifs -join "`n")).Replace('{ prereqs }', $prereqs)
+            $prereqs = if ($os -eq 'Linux') {
+                if ($RequiredPackages.Count -gt 0) {
+                    foreach ($package in $RequiredPackages) {
+                        $templates['Linux']['prereq'].Replace('{package}', $package.Name).Replace('{testCommand}', $package.TestCommand)
+                    }
+                } else {
+                    $null
+                }
+            } else {
+                $null
+            }
+            
+
+            $action.SetScript($os, ($templates[$os]['script'].Replace('{ preCommands }', $preCmds).Replace('{ jq }', ($jqs -join "`n")).Replace('{ prereqs }', $prereqs).Replace('{ if }', ($ifs -join "`n"))))
         }
     }
     $action
