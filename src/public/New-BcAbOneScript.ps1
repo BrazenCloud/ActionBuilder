@@ -16,34 +16,44 @@ Function New-BcAbOneScript {
         Parameters = $DefaultParameters
     }
 
+    if ($Parameters.Name -contains 'Custom Parameters') {
+        $firstParam = $Parameters | Where-Object { $_.Name -eq 'Custom Parameters' }
+        $startingIndex = 0
+    } else {
+        $firstParam = $firstParam
+        $startingIndex = 1
+    }
+
     # Build the first if
-    $out = if ($Parameters[0].Type -eq 2) {
-        $mcSplat.Parameters = $Parameters[0].GetValue($OperatingSystem)
+    $out = if ($firstParam.Type -eq 2) {
+        $mcSplat.Parameters = $firstParam.GetValue($OperatingSystem)
         $templates[$OperatingSystem]['if']['ifElse'] `
-            -replace '\{condition\}', $Parameters[0].GetIsTrueStatement($OperatingSystem) `
+            -replace '\{condition\}', $firstParam.GetIsTrueStatement($OperatingSystem) `
             -replace '\{command\}', (makeCommand @mcSplat)
-    } elseif ($Parameters[0].Type -eq 0) {
-        $mcSplat.Parameters = $Parameters[0].GetValue($OperatingSystem)
+    } elseif ($firstParam.Type -eq 0) {
+        $mcSplat.Parameters = $firstParam.GetValue($OperatingSystem)
         $templates[$OperatingSystem]['if']['ifElse'] `
-            -replace '\{condition\}', $Parameters[0].GetIsEmptyStatement($OperatingSystem) `
+            -replace '\{condition\}', $firstParam.GetIsEmptyStatement($OperatingSystem) `
             -replace '\{command\}', (makeCommand @mcSplat)
     }
 
     # Build the remaining ifs as the elseifelse
-    for ($x = 1; $x -lt $Parameters.Count; $x++) {
-        # if this param has a default value, use it, else it must have come from the passed actionParameters var
-        $ifStr = if ($Parameters[$x].Type -eq 2) {
-            $mcSplat.Parameters = $Parameters[$x].GetValue($OperatingSystem)
-            $templates[$OperatingSystem]['if']['elseIfElse'] `
-                -replace '\{condition\}', $Parameters[$x].GetIsTrueStatement($OperatingSystem) `
-                -replace '\{command\}', (makeCommand @mcSplat)
-        } elseif ($Parameters[$x].Type -eq 0) {
-            $mcSplat.Parameters = $Parameters[$x].GetValue($OperatingSystem)
-            $templates[$OperatingSystem]['if']['elseIfElse'] `
-                -replace '\{condition\}', $Parameters[$x].GetIsEmptyStatement($OperatingSystem) `
-                -replace '\{command\}', (makeCommand @mcSplat)
+    for ($x = $startingIndex; $x -lt $Parameters.Count; $x++) {
+        if ($Parameters[$x].Name -ne 'Custom Parameters') {
+            # if this param has a default value, use it, else it must have come from the passed actionParameters var
+            $ifStr = if ($Parameters[$x].Type -eq 2) {
+                $mcSplat.Parameters = $Parameters[$x].GetValue($OperatingSystem)
+                $templates[$OperatingSystem]['if']['elseIfElse'] `
+                    -replace '\{condition\}', $Parameters[$x].GetIsTrueStatement($OperatingSystem) `
+                    -replace '\{command\}', (makeCommand @mcSplat)
+            } elseif ($Parameters[$x].Type -eq 0) {
+                $mcSplat.Parameters = $Parameters[$x].GetValue($OperatingSystem)
+                $templates[$OperatingSystem]['if']['elseIfElse'] `
+                    -replace '\{condition\}', $Parameters[$x].GetIsEmptyStatement($OperatingSystem) `
+                    -replace '\{command\}', (makeCommand @mcSplat)
+            }
+            $out = $out -replace '\{else\}', $ifStr
         }
-        $out = $out -replace '\{else\}', $ifStr
     }
     # Build the final else statement
     if ($DefaultParameters.Length -gt 0) {
