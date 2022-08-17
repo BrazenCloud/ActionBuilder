@@ -4,6 +4,8 @@ Function New-BcAbConfig {
         [Parameter( Mandatory )]
         [string]$Name,
         [string]$Description,
+        [string[]]$Tags,
+        [string]$Language,
         [ValidateSet('Windows', 'Linux')]
         [string[]]$OperatingSystems,
         [Parameter( Mandatory )]
@@ -25,6 +27,8 @@ Function New-BcAbConfig {
         Name                           = $Name
         Description                    = $Description ? $Description : ""
         OperatingSystems               = $OperatingSystems ? $OperatingSystems : @("Windows", "Linux")
+        Tags                           = $Tags ? $Tags : @()
+        Language                       = $Language
         Command                        = $Command
         ExtraFolders                   = $ExtraFolders ? $ExtraFolders : @()
         IncludeParametersParameter     = $IncludeParametersParameter ? $IncludeParametersParameter : $false
@@ -43,6 +47,7 @@ Function New-BcAbConfig {
                 Name              = ''
                 CommandParameters = ''
                 Description       = ''
+                DefaultValue      = ''
             }
         )
     }
@@ -59,10 +64,10 @@ Function New-BcAbConfig {
     if ($PSBoundParameters.Keys -contains 'OutPath') {
         if (Test-Path $OutPath -PathType Container) {
             $OutPath = "$OutPath\config.json"
-        } elseIf (Test-Path $OutPath -PathType Leaf -and -not $Force.IsPresent) {
+        } elseIf ((Test-Path $OutPath -PathType Leaf) -and -not $Force.IsPresent) {
             Throw "Output Path: '$OutPath' already exists. Use -Force to overwrite."
         }
-        $ht | ConvertTo-Json -AsArray | Out-File $OutPath -Force:$Force.IsPresent
+        $ht | ConvertTo-Json -AsArray -Depth 3 | Out-File $OutPath -Force:$Force.IsPresent
     } else {
         $ht
     }
