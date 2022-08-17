@@ -53,8 +53,13 @@ Function New-BcAbCombineScript {
         }
     }
 
+    $ifArr = foreach ($str in $ifArr) {
+        $space = $OperatingSystem -eq 'Windows' ? '        ' : '    '
+        $str -split '\n' -join "`n$space"
+    }
+
     $mcSplat.Parameters = $OperatingSystem -eq 'Windows' ? '$arr' : '${arr[*]}'
-    $out = (($mainIf -replace '\{if\}', ($ifArr -join "`n"))) `
+    $out = (($mainIf -replace '\{if\}', ($ifArr -join "`n$space"))) `
         -replace '\{command\}', (makeCommand @mcSplat) `
         -replace '\{customParam\}', $customParam
     
