@@ -291,9 +291,11 @@ This generates the following script:
 Set-Location $PSScriptRoot
 $settings = Get-Content ..\settings.json | ConvertFrom-Json
 
-if ( $settings.'Volume'.ToString().Length -gt 0 -or $settings.'Scan'.ToString() -eq 'true' -or $settings.'Parameters'.ToString().Length -gt 0 ) {
+if ($settings.'Custom Parameters'.ToString().Length -gt 0) {
+    & chkdsk $($settings.'Custom Parameters')
+} elseif ( $settings.'Volume'.ToString().Length -gt 0 -or $settings.'Scan'.ToString() -eq 'true' ) {
     $arr = & {
-        if ($settings.'Volume'.Length -gt 0) {
+        if ($settings.'Volume'.ToString().Length -gt 0) {
             "$($settings.'Volume')"
         }
         if ($settings.'Scan'.ToString() -eq 'true') {
@@ -304,7 +306,6 @@ if ( $settings.'Volume'.ToString().Length -gt 0 -or $settings.'Scan'.ToString() 
 } else {
     chkdsk
 }
-
 ```
 
 ### debsums
@@ -342,8 +343,7 @@ if ( $settings.'Volume'.ToString().Length -gt 0 -or $settings.'Scan'.ToString() 
                 "Name": "debsums",
                 "TestCommand": "debsums"
             }
-        ],
-        "PreCommands": []
+        ]
     }
 ]
 ```
@@ -400,15 +400,14 @@ else
 fi
 
 Silent=$(jq -r '."Silent"' ../settings.json)
-Parameters=$(jq -r '."Parameters"' ../settings.json)
+CustomParameters=$(jq -r '."Custom Parameters"' ../settings.json)
 
 
-if [ ${Silent} == "true" ] ; then
+if [ ! -z "$CustomParameters" ] ; then
+    debsums $CustomParameters >> ../results/out.txt
+elif [[ ${Silent} == "true" ]]; then
     debsums -s >> ../results/out.txt
-elif [ ! -z "$Parameters" ]; then
-    debsums $Parameters >> ../results/out.txt
 else
     debsums >> ../results/out.txt
 fi
-
 ```
